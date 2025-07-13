@@ -175,18 +175,18 @@ export default function AiIntelligence() {
       </div>
 
       <Tabs defaultValue="organization" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="organization" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Organization Intelligence
+        <TabsList className="grid w-full grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-0 h-auto lg:h-10">
+          <TabsTrigger value="organization" className="flex items-center gap-2 justify-start px-4 py-3 lg:py-2">
+            <Users className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Organization Intelligence</span>
           </TabsTrigger>
-          <TabsTrigger value="document" className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Upload Grant Instructions
+          <TabsTrigger value="document" className="flex items-center gap-2 justify-start px-4 py-3 lg:py-2">
+            <FileText className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Upload Grant Instructions</span>
           </TabsTrigger>
-          <TabsTrigger value="generation" className="flex items-center gap-2">
-            <Brain className="w-4 h-4" />
-            Content Generation
+          <TabsTrigger value="generation" className="flex items-center gap-2 justify-start px-4 py-3 lg:py-2">
+            <Brain className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Content Generation</span>
           </TabsTrigger>
         </TabsList>
 
