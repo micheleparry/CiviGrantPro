@@ -20,7 +20,7 @@ CiviGrantAI is a full-stack web application designed to streamline the grant app
 
 Preferred communication style: Simple, everyday language.
 Navigation terminology: "Smart Narrative Builder" instead of "AI Assistant" for the narrative writing features.
-Navigation terminology: "Funding AlignIQ Blueprint" instead of "AI Intelligence" for the funding intelligence features.
+Navigation terminology: "AlignIQ Blueprint" instead of "AI Intelligence" for the funding intelligence features.
 
 ## System Architecture
 
