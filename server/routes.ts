@@ -8,7 +8,8 @@ import {
 } from "@shared/schema";
 import { 
   analyzeGrantMatch, generateNarrative, generateSuggestions, 
-  analyzeFunderPriorities 
+  analyzeFunderPriorities, analyzeOrganizationIntelligence,
+  analyzeDocumentRequirements, generateApplicationSection
 } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -289,6 +290,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(analysis);
     } catch (error) {
       res.status(500).json({ message: "Funder analysis failed", error: (error as Error).message });
+    }
+  });
+
+  // Enhanced AI intelligence features from Python integration
+  app.post("/api/ai/organization-intelligence", async (req, res) => {
+    try {
+      const { organizationName, grantTitle } = req.body;
+      
+      if (!organizationName) {
+        return res.status(400).json({ message: "Organization name is required" });
+      }
+      
+      const intelligence = await analyzeOrganizationIntelligence(organizationName, grantTitle);
+      res.json(intelligence);
+    } catch (error) {
+      res.status(500).json({ message: "Organization intelligence analysis failed", error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/ai/document-analysis", async (req, res) => {
+    try {
+      const { documentContent, documentType } = req.body;
+      
+      if (!documentContent) {
+        return res.status(400).json({ message: "Document content is required" });
+      }
+      
+      const analysis = await analyzeDocumentRequirements(documentContent, documentType);
+      res.json(analysis);
+    } catch (error) {
+      res.status(500).json({ message: "Document analysis failed", error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/ai/application-section", async (req, res) => {
+    try {
+      const { sectionType, projectDetails, grantRequirements, organizationIntelligence } = req.body;
+      
+      if (!sectionType || !projectDetails || !grantRequirements || !organizationIntelligence) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      const section = await generateApplicationSection(sectionType, projectDetails, grantRequirements, organizationIntelligence);
+      res.json(section);
+    } catch (error) {
+      res.status(500).json({ message: "Application section generation failed", error: (error as Error).message });
     }
   });
 

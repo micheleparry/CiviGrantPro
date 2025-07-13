@@ -48,6 +48,10 @@ Preferred communication style: Simple, everyday language.
 - **Narrative Generation**: Automated writing assistance for applications
 - **Suggestion System**: Contextual improvements and recommendations
 - **Funder Analysis**: Understanding of funder priorities and preferences
+- **Python Integration**: Enhanced intelligence features from existing CiviGrantAI Python system
+- **Organization Intelligence**: Comprehensive analysis of funding organizations
+- **Document Analysis**: Advanced parsing of grant documents for requirements extraction
+- **Application Generation**: Strategic content creation with compliance verification
 
 ### User Interface Features
 - **Dashboard**: Overview of applications, grants, and progress
@@ -76,6 +80,10 @@ Preferred communication style: Simple, everyday language.
 2. **OpenAI Integration**: Server makes authenticated requests to OpenAI API
 3. **Response Processing**: AI responses formatted and stored in database
 4. **Caching**: AI suggestions cached to improve performance and reduce costs
+5. **Python Integration**: Enhanced intelligence features from existing CiviGrantAI Python system
+6. **Organization Intelligence**: Comprehensive analysis of funding organizations with success factors
+7. **Document Analysis**: Advanced parsing of grant documents for requirements extraction
+8. **Application Generation**: Strategic content creation with compliance verification
 
 ## External Dependencies
 
