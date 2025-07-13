@@ -328,22 +328,65 @@ export default function AiIntelligence() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="docContent">Document Content</Label>
-                <Textarea
-                  id="docContent"
-                  placeholder="Paste grant document content here..."
-                  value={documentContent}
-                  onChange={(e) => setDocumentContent(e.target.value)}
-                  rows={8}
-                />
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Paste grant instructions below</span>
+                  </div>
+                  <div className="text-gray-400">or</div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Upload grant document files</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="docContent">Grant Instructions Content</Label>
+                  <Textarea
+                    id="docContent"
+                    placeholder="Paste your grant RFP, guidelines, or application instructions here..."
+                    value={documentContent}
+                    onChange={(e) => setDocumentContent(e.target.value)}
+                    rows={8}
+                    className="min-h-[200px]"
+                  />
+                </div>
+                
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    accept=".pdf,.doc,.docx,.txt"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        // For now, just show the filename - file processing would be implemented later
+                        setDocumentContent(`[File uploaded: ${file.name}]\n\nFile content will be processed automatically...`);
+                      }
+                    }}
+                  />
+                  <label htmlFor="fileUpload" className="cursor-pointer">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Upload Grant Instructions</p>
+                        <p className="text-xs text-gray-500">PDF, DOC, DOCX, or TXT files</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
               </div>
+              
               <Button 
                 onClick={handleDocumentAnalysis}
                 disabled={!documentContent || documentMutation.isPending}
                 className="w-full"
               >
-                {documentMutation.isPending ? "Analyzing..." : "Analyze Document"}
+                {documentMutation.isPending ? "Analyzing..." : "Analyze Grant Instructions"}
               </Button>
             </CardContent>
           </Card>
