@@ -195,10 +195,10 @@ export default function AiIntelligence() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-blue-600" />
-                Funding Organization Intelligence
+                Funding Mission and Goals
               </CardTitle>
               <CardDescription>
-                AlignIQ Blueprint is an AI-powered intelligence tool that maps the goals, metrics, and priorities of funding organizations to strategically align your project with their objectives. It ensures each grant proposal is crafted to fully encompass and reflect the funder's mission, increasing alignment, relevance, and the likelihood of securing an award.
+                AlignIQ Blueprint is an AI-powered intelligence tool that maps the goals, metrics, priorities, and mission of funding organizations to strategically align your project with their core objectives. It ensures each grant proposal is crafted to fully reflect the funder's strategic vision, increasing alignment, relevance, and the likelihood of a successful award.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
