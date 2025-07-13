@@ -10,7 +10,7 @@ const navigation = [
   { name: "Find Grants", href: "/grants", icon: Search, current: false },
   { name: "Applications", href: "/applications", icon: Edit, current: false },
   { name: "Smart Narrative Builder", href: "/ai-assistant", icon: Bot, current: false },
-  { name: "AI Intelligence", href: "/ai-intelligence", icon: Brain, current: false },
+  { name: "Funding AlignIQ Blueprint", href: "/ai-intelligence", icon: Brain, current: false },
   { name: "Progress", href: "/progress", icon: TrendingUp, current: false },
   { name: "Documents", href: "/documents", icon: FolderOpen, current: false },
 ];
