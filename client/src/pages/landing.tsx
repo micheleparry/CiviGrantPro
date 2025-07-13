@@ -19,13 +19,18 @@ export default function Landing() {
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
               An AI-powered grant writing platform that leverages advanced intelligence to help organizations strategically identify, analyze, and apply for funding opportunities.
             </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 max-w-2xl mx-auto">
+              <p className="text-sm text-blue-800">
+                <strong>Demo Mode:</strong> This is a demonstration version. Click "Get Started" to access the full application with sample data and AI features.
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={handleLogin}
                 size="lg"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold"
               >
-                Get Started
+                Get Started (Demo)
               </Button>
               <Button 
                 variant="outline" 
