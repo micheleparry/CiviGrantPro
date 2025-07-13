@@ -71,8 +71,8 @@ export default function Documents() {
   
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-  const [selectedApplication, setSelectedApplication] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [selectedApplication, setSelectedApplication] = useState<string>("all");
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
@@ -83,8 +83,8 @@ export default function Documents() {
 
   const filteredDocuments = sampleDocuments.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !typeFilter || doc.type === typeFilter;
-    const matchesApplication = !selectedApplication || doc.applicationId === parseInt(selectedApplication);
+    const matchesType = typeFilter === "all" || doc.type === typeFilter;
+    const matchesApplication = selectedApplication === "all" || doc.applicationId === parseInt(selectedApplication);
     return matchesSearch && matchesType && matchesApplication;
   });
 
@@ -286,7 +286,7 @@ export default function Documents() {
                 <SelectValue placeholder="Document Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 {documentTypes.map(type => (
                   <SelectItem key={type.value} value={type.value}>
                     {type.label}
@@ -299,7 +299,7 @@ export default function Documents() {
                 <SelectValue placeholder="Application" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Applications</SelectItem>
+                <SelectItem value="all">All Applications</SelectItem>
                 {applications?.map(app => (
                   <SelectItem key={app.id} value={app.id.toString()}>
                     {app.title}
