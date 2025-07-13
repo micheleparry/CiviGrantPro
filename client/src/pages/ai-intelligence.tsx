@@ -194,7 +194,7 @@ export default function AiIntelligence() {
           </TabsTrigger>
           <TabsTrigger value="document" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
-            Document Analysis
+            Upload Grant Instructions
           </TabsTrigger>
           <TabsTrigger value="generation" className="flex items-center gap-2">
             <Brain className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function AiIntelligence() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-green-600" />
-                Grant Document Analysis
+                Application Package Forms & Analysis
               </CardTitle>
               <CardDescription>
                 Upload or paste grant RFPs, guidelines, and announcements to automatically extract requirements, deadlines, eligibility criteria, and evaluation metrics. Save hours of manual document review.
