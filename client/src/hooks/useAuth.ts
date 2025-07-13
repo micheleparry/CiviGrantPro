@@ -8,7 +8,7 @@ export function useAuth() {
     gcTime: 0, // Don't cache the response (TanStack Query v5)
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchInterval: 5000, // Refetch every 5 seconds to catch auth changes
+    refetchInterval: 10000, // Refetch every 10 seconds to catch auth changes
   });
 
   return {

@@ -12,38 +12,164 @@ import {
   analyzeDocumentRequirements, generateApplicationSection
 } from "./services/openai";
 
-// Simple session store for demo purposes
-let isUserLoggedIn = true;
+// Enhanced session store with better persistence
+interface UserSession {
+  isLoggedIn: boolean;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+    organizationId: number;
+    role: string;
+    firstName?: string;
+    lastName?: string;
+  } | null;
+  loginTime: Date | null;
+  notifications: Array<{
+    id: number;
+    title: string;
+    message: string;
+    type: 'success' | 'info' | 'warning' | 'error';
+    isRead: boolean;
+    createdAt: Date;
+  }>;
+}
+
+// Session store with demo data
+let userSession: UserSession = {
+  isLoggedIn: true,
+  user: {
+    id: 1,
+    email: "user@example.com",
+    username: "demo_user",
+    organizationId: 1,
+    role: "user",
+    firstName: "Demo",
+    lastName: "User"
+  },
+  loginTime: new Date(),
+  notifications: [
+    {
+      id: 1,
+      title: "Welcome to CiviGrantAI",
+      message: "Your account has been created successfully! Ready to secure your next grant?",
+      type: 'success',
+      isRead: false,
+      createdAt: new Date(Date.now() - 1000 * 60 * 5) // 5 minutes ago
+    },
+    {
+      id: 2,
+      title: "Grant Analysis Complete",
+      message: "Your BLM Wildlife grant document analysis is ready for review.",
+      type: 'info',
+      isRead: false,
+      createdAt: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
+    },
+    {
+      id: 3,
+      title: "Application Deadline Reminder",
+      message: "Don't forget: Your EPA Environmental Justice grant application is due in 3 days.",
+      type: 'warning',
+      isRead: false,
+      createdAt: new Date(Date.now() - 1000 * 60 * 60) // 1 hour ago
+    }
+  ]
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get("/api/auth/user", async (req, res) => {
     // Check if user is logged in
-    if (!isUserLoggedIn) {
+    if (!userSession.isLoggedIn || !userSession.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
     
-    // Return mock user data when authenticated
-    const mockUser = {
-      id: 1,
-      email: "user@example.com",
-      username: "demo_user",
-      organizationId: 1,
-      role: "user"
-    };
-    res.json(mockUser);
+    // Return current user data
+    res.json(userSession.user);
   });
 
   app.get("/api/login", (req, res) => {
     // Set user as logged in
-    isUserLoggedIn = true;
+    userSession.isLoggedIn = true;
+    userSession.loginTime = new Date();
+    
+    // Add login notification
+    userSession.notifications.unshift({
+      id: Date.now(),
+      title: "Login Successful",
+      message: `Welcome back, ${userSession.user?.firstName || 'User'}!`,
+      type: 'success',
+      isRead: false,
+      createdAt: new Date()
+    });
+    
     res.redirect("/");
   });
 
   app.get("/api/logout", (req, res) => {
+    // Add logout notification before clearing session
+    if (userSession.user) {
+      userSession.notifications.unshift({
+        id: Date.now(),
+        title: "Logged Out",
+        message: "You have been logged out successfully.",
+        type: 'info',
+        isRead: false,
+        createdAt: new Date()
+      });
+    }
+    
     // Clear authentication state
-    isUserLoggedIn = false;
+    userSession.isLoggedIn = false;
+    userSession.loginTime = null;
+    
     res.redirect("/");
+  });
+
+  // Notification API endpoints
+  app.get("/api/notifications", async (req, res) => {
+    if (!userSession.isLoggedIn) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    res.json(userSession.notifications);
+  });
+
+  app.get("/api/notifications/unread-count", async (req, res) => {
+    if (!userSession.isLoggedIn) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const unreadCount = userSession.notifications.filter(n => !n.isRead).length;
+    res.json({ count: unreadCount });
+  });
+
+  app.post("/api/notifications/:id/read", async (req, res) => {
+    if (!userSession.isLoggedIn) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const notificationId = parseInt(req.params.id);
+    const notification = userSession.notifications.find(n => n.id === notificationId);
+    
+    if (notification) {
+      notification.isRead = true;
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ message: "Notification not found" });
+    }
+  });
+
+  app.post("/api/notifications/mark-all-read", async (req, res) => {
+    if (!userSession.isLoggedIn) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    userSession.notifications.forEach(notification => {
+      notification.isRead = true;
+    });
+    
+    res.json({ success: true });
   });
 
   // Users

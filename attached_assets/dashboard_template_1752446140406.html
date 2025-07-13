@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CiviGrantAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #667eea !important;
+        }
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #6c757d;
+            transition: color 0.3s;
+        }
+        .notification-bell:hover {
+            color: #667eea;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .notification-dropdown {
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .notification-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        .notification-item.unread {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .notification-message {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        .notification-time {
+            font-size: 11px;
+            color: #adb5bd;
+        }
+        .user-dropdown {
+            cursor: pointer;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .sidebar {
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 76px);
+        }
+        .sidebar .nav-link {
+            color: #6c757d;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 12px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #667eea;
+            color: white;
+        }
+        .main-content {
+            padding: 2rem;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-graduation-cap me-2"></i>CiviGrantAI
+            </a>
+            
+            <div class="navbar-nav ms-auto d-flex flex-row align-items-center">
+                <!-- Notification Bell -->
+                <div class="nav-item dropdown me-3">
+                    <div class="notification-bell" id="notificationBell" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationDropdown">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center">
+                            <span>Notifications</span>
+                            <button class="btn btn-sm btn-link text-primary p-0" id="markAllRead">
+                                Mark all read
+                            </button>
+                        </div>
+                        <div id="notificationList">
+                            <div class="text-center p-3 text-muted">
+                                <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                                <p class="mb-0">No notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Dropdown -->
+                <div class="nav-item dropdown">
+                    <div class="user-dropdown d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-avatar me-2">
+                            {{ current_user[4][0] if current_user and current_user[4] else 'U' }}
+                        </div>
+                        <span class="me-2">{{ current_user[4] if current_user else 'User' }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">{{ current_user[4] }} {{ current_user[5] if current_user else '' }}</h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar">
+                    <nav class="nav flex-column pt-3">
+                        <a class="nav-link active" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-search me-2"></i>Find Grants
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-file-alt me-2"></i>Applications
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-robot me-2"></i>AI Assistant
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-brain me-2"></i>AI Intelligence
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-line me-2"></i>Progress
+                        </a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-folder me-2"></i>Documents
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="main-content">
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }} me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <!-- Welcome Card -->
+                    <div class="welcome-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2>Welcome back, {{ current_user[4] if current_user else 'User' }}! 🌟</h2>
+                                <p class="mb-0">Ready to secure your next grant? Let's make it happen!</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <i class="fas fa-rocket fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h5 class="mb-1">2</h5>
+                                <p class="text-muted mb-0">Grants Found</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h5 class="mb-1">3</h5>
+                                <p class="text-muted mb-0">Applications</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #17a2b8, #6f42c1);">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <h5 class="mb-1">4</h5>
+                                <p class="text-muted mb-0">AI Assists</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #dc3545, #e83e8c);">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <h5 class="mb-1">5</h5>
+                                <p class="text-muted mb-0">Intelligence</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Recent Activity</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Authentication System Active!</strong> 
+                                        Login/logout and notification system are now fully functional.
+                                    </div>
+                                    <p class="text-muted">Your grant application journey starts here. Use the navigation menu to explore all features.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Notification System
+        class NotificationManager {
+            constructor() {
+                this.bell = document.getElementById('notificationBell');
+                this.badge = document.getElementById('notificationBadge');
+                this.list = document.getElementById('notificationList');
+                this.markAllBtn = document.getElementById('markAllRead');
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadNotifications();
+                this.updateUnreadCount();
+                
+                // Auto-refresh every 30 seconds
+                setInterval(() => {
+                    this.updateUnreadCount();
+                }, 30000);
+                
+                // Mark all read button
+                this.markAllBtn.addEventListener('click', () => {
+                    this.markAllRead();
+                });
+            }
+            
+            async loadNotifications() {
+                try {
+                    const response = await fetch('/api/notifications');
+                    const notifications = await response.json();
+                    this.renderNotifications(notifications);
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                }
+            }
+            
+            async updateUnreadCount() {
+                try {
+                    const response = await fetch('/api/notifications/unread-count');
+                    const data = await response.json();
+                    const count = data.count;
+                    
+                    if (count > 0) {
+                        this.badge.textContent = count > 99 ? '99+' : count;
+                        this.badge.style.display = 'flex';
+                    } else {
+                        this.badge.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error updating unread count:', error);
+                }
+            }
+            
+            renderNotifications(notifications) {
+                if (notifications.length === 0) {
+                    this.list.innerHTML = `
+                        <div class="text-center p-3 text-muted">
+                            <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                            <p class="mb-0">No notifications</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                this.list.innerHTML = notifications.map(notif => `
+                    <div class="notification-item ${!notif.is_read ? 'unread' : ''}" 
+                         data-id="${notif.id}" onclick="notificationManager.markAsRead(${notif.id})">
+                        <div class="notification-title">${notif.title}</div>
+                        <div class="notification-message">${notif.message}</div>
+                        <div class="notification-time">${this.formatTime(notif.created_at)}</div>
+                    </div>
+                `).join('');
+            }
+            
+            async markAsRead(notificationId) {
+                try {
+                    await fetch(`/api/notifications/${notificationId}/read`, {
+                        method: 'POST'
+                    });
+                    this.loadNotifications();
+                    this.updateUnreadCount();
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                }
+            }
+            
+            async markAllRead() {
+                try {
+                    await fetch('/api/notifications/mark-all-read', {
+                        method: 'POST'
+                    });
+                    this.loadNotifications();
+                    this.updateUnreadCount();
+                } catch (error) {
+                    console.error('Error marking all notifications as read:', error);
+                }
+            }
+            
+            formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return 'Just now';
+                if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+                if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+                return `${Math.floor(diff / 86400000)}d ago`;
+            }
+        }
+        
+        // Initialize notification manager
+        const notificationManager = new NotificationManager();
+        
+        // Load notifications when dropdown is opened
+        document.getElementById('notificationBell').addEventListener('click', () => {
+            notificationManager.loadNotifications();
+        });
+    </script>
+</body>
+</html>
+
