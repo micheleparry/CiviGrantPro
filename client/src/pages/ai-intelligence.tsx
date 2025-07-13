@@ -210,7 +210,7 @@ export default function AiIntelligence() {
                 Funding Organization Intelligence
               </CardTitle>
               <CardDescription>
-                Get comprehensive insights about funding organizations and their priorities
+                Research funding organizations to understand their priorities, success patterns, and strategic requirements. This intelligence helps you tailor your approach and increase success rates.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -258,11 +258,22 @@ export default function AiIntelligence() {
                       <h3 className="font-semibold text-purple-600 mb-2">Funding Trends</h3>
                       <div className="space-y-1">
                         {organizationMutation.data.fundingTrends.map((trend, idx) => (
-                          <Badge key={idx} variant="secondary" className="mr-2 mb-2">
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setOrganizationName(trend);
+                              setGrantTitle(`${trend} Programs`);
+                            }}
+                            className="mr-2 mb-2 px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-full border border-purple-300 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-900/40 transition-colors cursor-pointer"
+                          >
                             {trend}
-                          </Badge>
+                            <span className="ml-2 text-xs opacity-70">↗</span>
+                          </button>
                         ))}
                       </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                        Click trends to explore specific funding areas
+                      </p>
                     </div>
                     <div>
                       <h3 className="font-semibold text-blue-600 mb-2">Success Factors</h3>
@@ -313,7 +324,7 @@ export default function AiIntelligence() {
                 Grant Document Analysis
               </CardTitle>
               <CardDescription>
-                Extract requirements, deadlines, and key information from grant documents
+                Upload or paste grant RFPs, guidelines, and announcements to automatically extract requirements, deadlines, eligibility criteria, and evaluation metrics. Save hours of manual document review.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -398,7 +409,7 @@ export default function AiIntelligence() {
                 Application Section Generation
               </CardTitle>
               <CardDescription>
-                Generate professional application sections using AI intelligence
+                Create professional, tailored application sections using insights from organization intelligence and document analysis. Generate compelling content that aligns with funder priorities.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
