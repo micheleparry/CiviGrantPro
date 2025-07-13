@@ -81,12 +81,15 @@ export default function Documents() {
     queryKey: ["/api/applications/organization", CURRENT_ORG_ID],
   });
 
-  const filteredDocuments = sampleDocuments.filter(doc => {
-    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = typeFilter === "all" || doc.type === typeFilter;
-    const matchesApplication = selectedApplication === "all" || doc.applicationId === parseInt(selectedApplication);
-    return matchesSearch && matchesType && matchesApplication;
-  });
+  const getFilteredDocuments = (tabFilter: string) => {
+    return sampleDocuments.filter(doc => {
+      const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = typeFilter === "all" || doc.type === typeFilter;
+      const matchesApplication = selectedApplication === "all" || doc.applicationId === parseInt(selectedApplication);
+      const matchesTab = tabFilter === "all" || doc.type === tabFilter;
+      return matchesSearch && matchesType && matchesApplication && matchesTab;
+    });
+  };
 
   const handleDownload = (document: any) => {
     toast({
@@ -143,17 +146,99 @@ export default function Documents() {
     }
   };
 
+  const DocumentGrid = ({ documents }: { documents: any[] }) => {
+    if (documents.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <FolderOpen className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+          <h3 className="text-lg font-semibold text-slate-600">No documents found</h3>
+          <p className="text-slate-500 mt-2">Try adjusting your search terms or filters</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {documents.map((document) => {
+          const TypeIcon = getTypeIcon(document.type);
+          return (
+            <Card key={document.id} className="border border-slate-200 hover:border-vibrant-blue transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-vibrant-blue/10 rounded-lg flex items-center justify-center">
+                      <TypeIcon className="text-vibrant-blue" size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-800 text-sm line-clamp-1">
+                        {document.name}
+                      </h4>
+                      <p className="text-xs text-slate-500">{document.size}</p>
+                    </div>
+                  </div>
+                  <Badge className={`text-xs ${getStatusColor(document.status)}`}>
+                    {document.status}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
+                  <span>Modified {document.lastModified}</span>
+                  <Badge variant="outline" className="text-xs">
+                    {documentTypes.find(t => t.value === document.type)?.label}
+                  </Badge>
+                </div>
+
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDownload(document)}
+                    className="flex-1 text-xs"
+                  >
+                    <Eye size={12} className="mr-1" />
+                    View
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setSelectedDocument(document);
+                      setExportDialogOpen(true);
+                    }}
+                    className="flex-1 text-xs"
+                  >
+                    <Download size={12} className="mr-1" />
+                    Export
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDuplicate(document)}
+                    className="text-xs"
+                  >
+                    <Copy size={12} />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    );
+  };
+
   const getTypeIcon = (type: string) => {
     const docType = documentTypes.find(dt => dt.value === type);
     return docType ? docType.icon : FileText;
   };
 
+  const allDocuments = getFilteredDocuments("all");
   const documentStats = {
-    total: filteredDocuments.length,
-    narratives: filteredDocuments.filter(d => d.type === "narrative").length,
-    budgets: filteredDocuments.filter(d => d.type === "budget").length,
-    templates: filteredDocuments.filter(d => d.type === "template").length,
-    supporting: filteredDocuments.filter(d => d.type === "supporting").length,
+    total: allDocuments.length,
+    narratives: allDocuments.filter(d => d.type === "narrative").length,
+    budgets: allDocuments.filter(d => d.type === "budget").length,
+    templates: allDocuments.filter(d => d.type === "template").length,
+    supporting: allDocuments.filter(d => d.type === "supporting").length,
   };
 
   return (
@@ -318,7 +403,7 @@ export default function Documents() {
             <FileType className="mr-2" size={20} />
             Your Documents
             <Badge variant="outline" className="ml-3 border-forest-green text-forest-green">
-              {filteredDocuments.length} documents
+              {allDocuments.length} documents
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -332,81 +417,24 @@ export default function Documents() {
               <TabsTrigger value="supporting">Supporting</TabsTrigger>
             </TabsList>
 
-            <TabsContent value={selectedTab} className="mt-6">
-              {filteredDocuments.length === 0 ? (
-                <div className="text-center py-12">
-                  <FolderOpen className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-600">No documents found</h3>
-                  <p className="text-slate-500 mt-2">Try adjusting your search terms or filters</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredDocuments.map((document) => {
-                    const TypeIcon = getTypeIcon(document.type);
-                    return (
-                      <Card key={document.id} className="border border-slate-200 hover:border-vibrant-blue transition-colors">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 bg-vibrant-blue/10 rounded-lg flex items-center justify-center">
-                                <TypeIcon className="text-vibrant-blue" size={20} />
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-slate-800 text-sm line-clamp-1">
-                                  {document.name}
-                                </h4>
-                                <p className="text-xs text-slate-500">{document.size}</p>
-                              </div>
-                            </div>
-                            <Badge className={`text-xs ${getStatusColor(document.status)}`}>
-                              {document.status}
-                            </Badge>
-                          </div>
-                          
-                          <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
-                            <span>Modified {document.lastModified}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {documentTypes.find(t => t.value === document.type)?.label}
-                            </Badge>
-                          </div>
-
-                          <div className="flex space-x-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleDownload(document)}
-                              className="flex-1 text-xs"
-                            >
-                              <Eye size={12} className="mr-1" />
-                              View
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                setSelectedDocument(document);
-                                setExportDialogOpen(true);
-                              }}
-                              className="flex-1 text-xs"
-                            >
-                              <Download size={12} className="mr-1" />
-                              Export
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleDuplicate(document)}
-                              className="text-xs"
-                            >
-                              <Copy size={12} />
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
+            <TabsContent value="all" className="mt-6">
+              <DocumentGrid documents={getFilteredDocuments("all")} />
+            </TabsContent>
+            
+            <TabsContent value="narratives" className="mt-6">
+              <DocumentGrid documents={getFilteredDocuments("narrative")} />
+            </TabsContent>
+            
+            <TabsContent value="budgets" className="mt-6">
+              <DocumentGrid documents={getFilteredDocuments("budget")} />
+            </TabsContent>
+            
+            <TabsContent value="templates" className="mt-6">
+              <DocumentGrid documents={getFilteredDocuments("template")} />
+            </TabsContent>
+            
+            <TabsContent value="supporting" className="mt-6">
+              <DocumentGrid documents={getFilteredDocuments("supporting")} />
             </TabsContent>
           </Tabs>
         </CardContent>
