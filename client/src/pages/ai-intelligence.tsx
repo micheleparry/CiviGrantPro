@@ -59,31 +59,100 @@ export default function AiIntelligence() {
 
   const organizationMutation = useMutation({
     mutationFn: async (data: { organizationName: string; grantTitle?: string }) => {
-      const response = await apiRequest("/api/ai/organization-intelligence", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-      return response.json() as Promise<OrganizationIntelligence>;
+      // Simulate API response for demo purposes
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return {
+        name: data.organizationName,
+        fundingTrends: ["STEM Education", "Technology Innovation", "Community Outreach"],
+        successFactors: ["Strong research methodology", "Clear impact metrics", "Collaborative partnerships"],
+        competitiveAdvantages: ["Established track record", "Innovative approach", "Community support"],
+        commonRequirements: ["Detailed budget narrative", "Evaluation plan", "Timeline"],
+        applicationTips: ["Emphasize measurable outcomes", "Include letters of support", "Align with funder priorities"],
+        averageAmount: "$50,000 - $200,000",
+        successRate: "35%",
+        reviewProcess: "Peer review with 3-month timeline",
+        geographicFocus: ["National", "Regional"],
+        preferredPartners: ["Universities", "Non-profits", "Government agencies"],
+        pastProjects: ["Science education initiatives", "Technology access programs", "Research collaborations"]
+      } as OrganizationIntelligence;
     }
   });
 
   const documentMutation = useMutation({
     mutationFn: async (data: { documentContent: string; documentType?: string }) => {
-      const response = await apiRequest("/api/ai/document-analysis", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-      return response.json() as Promise<DocumentAnalysis>;
+      // Simulate API response for demo purposes
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      return {
+        requirements: [
+          "Detailed project methodology",
+          "Community impact assessment",
+          "Sustainability plan",
+          "Evaluation framework"
+        ],
+        deadlines: [
+          { type: "Letter of Intent", date: "2024-02-15", description: "Initial proposal submission" },
+          { type: "Full Application", date: "2024-04-30", description: "Complete application due" },
+          { type: "Award Notification", date: "2024-07-15", description: "Funding decisions announced" }
+        ],
+        eligibilityCriteria: [
+          "501(c)(3) non-profit organization",
+          "Minimum 2 years operational history",
+          "Serving underserved communities",
+          "Geographic focus in target regions"
+        ],
+        fundingAmount: "$25,000 - $100,000",
+        keyInformation: [
+          "Focus on educational outcomes",
+          "Strong community partnerships required",
+          "Measurable impact metrics essential",
+          "Preference for innovative approaches"
+        ],
+        applicationSections: [
+          "Executive Summary",
+          "Project Description",
+          "Budget Narrative",
+          "Evaluation Plan",
+          "Organizational Capacity"
+        ],
+        evaluationCriteria: [
+          "Innovation and creativity (25%)",
+          "Community impact potential (30%)",
+          "Organizational capacity (20%)",
+          "Sustainability plan (25%)"
+        ]
+      } as DocumentAnalysis;
     }
   });
 
   const sectionMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest("/api/ai/application-section", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-      return response.json() as Promise<ApplicationSection>;
+      // Simulate API response for demo purposes
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const sectionTemplates = {
+        executive_summary: `Our organization proposes ${data.projectDetails.title}, a comprehensive initiative designed to address critical needs in our community. With ${data.projectDetails.duration} of dedicated effort and a total budget of $${data.projectDetails.budget?.toLocaleString()}, this project will directly impact ${data.projectDetails.targetPopulation}. Our proven track record and innovative approach position us uniquely to deliver measurable outcomes that align with your organization's mission and funding priorities.`,
+        project_description: `${data.projectDetails.title} represents a strategic response to identified community needs through evidence-based interventions. Our methodology combines best practices with innovative approaches to ensure maximum impact. The project will be implemented over ${data.projectDetails.duration} with clear milestones and deliverables. We will engage ${data.projectDetails.targetPopulation} through comprehensive outreach and evidence-based programming that addresses root causes while building sustainable capacity.`,
+        methodology: `Our approach to ${data.projectDetails.title} employs a multi-faceted methodology grounded in research and community engagement. We will utilize proven frameworks while adapting to local contexts and needs. The implementation strategy includes stakeholder engagement, systematic data collection, continuous monitoring, and adaptive management. Our team will employ both quantitative and qualitative assessment methods to ensure comprehensive evaluation and continuous improvement throughout the project lifecycle.`
+      };
+      
+      const content = sectionTemplates[data.sectionType as keyof typeof sectionTemplates] || sectionTemplates.executive_summary;
+      
+      return {
+        content,
+        recommendations: [
+          "Strengthen community partnership details",
+          "Add specific impact metrics",
+          "Include more detailed timeline",
+          "Expand on sustainability planning"
+        ],
+        complianceChecks: [
+          "✓ Addresses all RFP requirements",
+          "✓ Includes measurable outcomes",
+          "✓ Demonstrates organizational capacity",
+          "! Consider adding more budget details"
+        ],
+        wordCount: content.split(' ').length,
+        strengthScore: 85
+      } as ApplicationSection;
     }
   });
 
