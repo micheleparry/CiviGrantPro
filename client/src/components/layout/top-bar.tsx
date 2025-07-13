@@ -25,14 +25,16 @@ export default function TopBar() {
   const { data: notifications = [], refetch: refetchNotifications } = useQuery({
     queryKey: ["/api/notifications"],
     enabled: !!user,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: false, // Disable automatic refetching
+    staleTime: 60000, // Cache for 1 minute
   });
 
   // Fetch unread count
   const { data: unreadData, refetch: refetchUnreadCount } = useQuery({
     queryKey: ["/api/notifications/unread-count"],
     enabled: !!user,
-    refetchInterval: 30000,
+    refetchInterval: false, // Disable automatic refetching  
+    staleTime: 60000, // Cache for 1 minute
   });
 
   // Mark notification as read

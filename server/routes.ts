@@ -35,45 +35,40 @@ interface UserSession {
   }>;
 }
 
-// Session store with demo data
-let userSession: UserSession = {
-  isLoggedIn: true,
-  user: {
+// Default session data 
+const defaultNotifications = [
+  {
     id: 1,
-    email: "user@example.com",
-    username: "demo_user",
-    organizationId: 1,
-    role: "user",
-    firstName: "Demo",
-    lastName: "User"
+    title: "Welcome to CiviGrantAI",
+    message: "Your account has been created successfully! Ready to secure your next grant?",
+    type: 'success' as const,
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 5) // 5 minutes ago
   },
-  loginTime: new Date(),
-  notifications: [
-    {
-      id: 1,
-      title: "Welcome to CiviGrantAI",
-      message: "Your account has been created successfully! Ready to secure your next grant?",
-      type: 'success',
-      isRead: false,
-      createdAt: new Date(Date.now() - 1000 * 60 * 5) // 5 minutes ago
-    },
-    {
-      id: 2,
-      title: "Grant Analysis Complete",
-      message: "Your BLM Wildlife grant document analysis is ready for review.",
-      type: 'info',
-      isRead: false,
-      createdAt: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
-    },
-    {
-      id: 3,
-      title: "Application Deadline Reminder",
-      message: "Don't forget: Your EPA Environmental Justice grant application is due in 3 days.",
-      type: 'warning',
-      isRead: false,
-      createdAt: new Date(Date.now() - 1000 * 60 * 60) // 1 hour ago
-    }
-  ]
+  {
+    id: 2,
+    title: "Grant Analysis Complete",
+    message: "Your BLM Wildlife grant document analysis is ready for review.",
+    type: 'info' as const,
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
+  },
+  {
+    id: 3,
+    title: "Application Deadline Reminder",
+    message: "Don't forget: Your EPA Environmental Justice grant application is due in 3 days.",
+    type: 'warning' as const,
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60) // 1 hour ago
+  }
+];
+
+// Session store - start logged out, user needs to click login button  
+let userSession: UserSession = {
+  isLoggedIn: false,
+  user: null,
+  loginTime: null,
+  notifications: []
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -91,7 +86,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/login", (req, res) => {
     // Set user as logged in
     userSession.isLoggedIn = true;
+    userSession.user = {
+      id: 1,
+      email: "user@example.com",
+      username: "demo_user",
+      organizationId: 1,
+      role: "user",
+      firstName: "Demo",
+      lastName: "User"
+    };
     userSession.loginTime = new Date();
+    userSession.notifications = [...defaultNotifications];
     
     // Add login notification
     userSession.notifications.unshift({
@@ -107,21 +112,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/logout", (req, res) => {
-    // Add logout notification before clearing session
-    if (userSession.user) {
-      userSession.notifications.unshift({
-        id: Date.now(),
-        title: "Logged Out",
-        message: "You have been logged out successfully.",
-        type: 'info',
-        isRead: false,
-        createdAt: new Date()
-      });
-    }
-    
-    // Clear authentication state
+    // Clear authentication state immediately
     userSession.isLoggedIn = false;
+    userSession.user = null;
     userSession.loginTime = null;
+    userSession.notifications = [];
     
     res.redirect("/");
   });

@@ -20,6 +20,7 @@ import TopBar from "@/components/layout/top-bar";
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
+  // Show loading only during initial authentication check
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">

@@ -6,6 +6,16 @@ CiviGrantAI is a full-stack web application designed to streamline the grant app
 
 ## Recent Changes
 
+### Enhanced Authentication & Notification System (January 2025)
+- ✅ **Fixed Authentication Flow**: Implemented proper login/logout functionality with session management
+- ✅ **Working Notification Bell**: Added fully functional notification system with real-time updates
+- ✅ **Session State Management**: Enhanced session persistence with proper user state handling
+- ✅ **Notification Features**: Added mark as read, mark all read, and notification type indicators
+- ✅ **Landing Page Login**: Users now start on landing page and can log in via "Get Started" button
+- ✅ **Logout Functionality**: Fixed logout to properly clear session and return to landing page
+- ✅ **Real-time Updates**: Notifications auto-refresh every 30 seconds with live unread counts
+- ✅ **Demo Data**: Added sample notifications (Welcome, Grant Analysis, Deadline Reminders)
+
 ### Authentication System Implementation (January 2025)
 - Created comprehensive authentication system with landing page for logged-out users
 - Implemented useAuth hook for authentication state management
