@@ -13,10 +13,17 @@ import {
 } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Simple session store for demo purposes
+  let isUserLoggedIn = true;
+
   // Authentication routes
   app.get("/api/auth/user", async (req, res) => {
-    // For now, return mock user data for development
-    // In production, this would check session/token
+    // Check if user is logged in
+    if (!isUserLoggedIn) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    // Return mock user data when authenticated
     const mockUser = {
       id: 1,
       email: "user@example.com",
@@ -28,14 +35,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/login", (req, res) => {
-    // Redirect to actual login implementation
-    // For now, redirect to home since we're using mock auth
+    // Set user as logged in
+    isUserLoggedIn = true;
     res.redirect("/");
   });
 
   app.get("/api/logout", (req, res) => {
-    // Clear session/token and redirect to landing
-    // For now, just redirect to root which will show landing page
+    // Clear authentication state
+    isUserLoggedIn = false;
     res.redirect("/");
   });
 
