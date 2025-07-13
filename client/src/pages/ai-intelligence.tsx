@@ -80,46 +80,34 @@ export default function AiIntelligence() {
 
   const documentMutation = useMutation({
     mutationFn: async (data: { documentContent: string; documentType?: string }) => {
-      // Simulate API response for demo purposes
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await apiRequest('/api/ai/analyze-grant-document', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          documentText: data.documentContent,
+          documentName: data.documentType || 'Grant Document'
+        })
+      });
+      
+      // Transform the Python analyzer response to match our interface
+      const result = await response.json();
+      
       return {
-        requirements: [
-          "Detailed project methodology",
-          "Community impact assessment",
-          "Sustainability plan",
-          "Evaluation framework"
-        ],
-        deadlines: [
-          { type: "Letter of Intent", date: "2024-02-15", description: "Initial proposal submission" },
-          { type: "Full Application", date: "2024-04-30", description: "Complete application due" },
-          { type: "Award Notification", date: "2024-07-15", description: "Funding decisions announced" }
-        ],
-        eligibilityCriteria: [
-          "501(c)(3) non-profit organization",
-          "Minimum 2 years operational history",
-          "Serving underserved communities",
-          "Geographic focus in target regions"
-        ],
-        fundingAmount: "$25,000 - $100,000",
-        keyInformation: [
-          "Focus on educational outcomes",
-          "Strong community partnerships required",
-          "Measurable impact metrics essential",
-          "Preference for innovative approaches"
-        ],
-        applicationSections: [
-          "Executive Summary",
-          "Project Description",
-          "Budget Narrative",
-          "Evaluation Plan",
-          "Organizational Capacity"
-        ],
-        evaluationCriteria: [
-          "Innovation and creativity (25%)",
-          "Community impact potential (30%)",
-          "Organizational capacity (20%)",
-          "Sustainability plan (25%)"
-        ]
+        requirements: result.application_requirements?.required_documents || [],
+        deadlines: result.deadlines_and_dates?.important_dates?.map((date: string) => ({
+          type: 'Important Date',
+          date: date,
+          description: 'Grant deadline'
+        })) || [],
+        eligibilityCriteria: result.eligibility_requirements?.eligible_applicants || [],
+        fundingAmount: result.funding_details?.funding_amounts?.[0] || 'Not specified',
+        keyInformation: result.strategic_insights?.strategic_insights || [],
+        applicationSections: result.application_requirements?.required_documents || [],
+        evaluationCriteria: result.evaluation_criteria?.evaluation_criteria?.map((criteria: any) => 
+          `${criteria.category} (${criteria.weight})`
+        ) || []
       } as DocumentAnalysis;
     }
   });

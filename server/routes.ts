@@ -339,6 +339,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Python-based Enhanced Grant Analysis
+  app.post("/api/ai/analyze-grant-document", async (req, res) => {
+    try {
+      const { documentText, documentName } = req.body;
+      
+      if (!documentText) {
+        return res.status(400).json({ message: "Document text is required" });
+      }
+      
+      const { pythonAnalyzer } = await import("./services/pythonAnalyzer");
+      const analysis = await pythonAnalyzer.analyzeGrantDocument(documentText, documentName);
+      res.json(analysis);
+    } catch (error) {
+      res.status(500).json({ message: "Grant document analysis failed", error: (error as Error).message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
