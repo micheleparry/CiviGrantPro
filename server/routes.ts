@@ -145,6 +145,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const notificationId = parseInt(req.params.id);
+    if (isNaN(notificationId)) {
+      return res.status(400).json({ message: "Invalid notification ID" });
+    }
     const notification = userSession.notifications.find(n => n.id === notificationId);
     
     if (notification) {
@@ -169,7 +172,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Users
   app.get("/api/users/:id", async (req, res) => {
-    const user = await storage.getUser(parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+    const user = await storage.getUser(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -188,7 +195,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Organizations
   app.get("/api/organizations/:id", async (req, res) => {
-    const org = await storage.getOrganization(parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid organization ID" });
+    }
+    const org = await storage.getOrganization(id);
     if (!org) {
       return res.status(404).json({ message: "Organization not found" });
     }
@@ -218,7 +229,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/grants/:id", async (req, res) => {
-    const grant = await storage.getGrant(parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid grant ID" });
+    }
+    const grant = await storage.getGrant(id);
     if (!grant) {
       return res.status(404).json({ message: "Grant not found" });
     }
@@ -226,11 +241,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/grants/matches/:organizationId", async (req, res) => {
+    const organizationId = parseInt(req.params.organizationId);
+    if (isNaN(organizationId)) {
+      return res.status(400).json({ message: "Invalid organization ID" });
+    }
     const { limit } = req.query;
-    const grants = await storage.getGrantsByMatch(
-      parseInt(req.params.organizationId),
-      limit ? parseInt(limit as string) : undefined
-    );
+    const limitNumber = limit ? parseInt(limit as string) : undefined;
+    if (limit && isNaN(limitNumber!)) {
+      return res.status(400).json({ message: "Invalid limit parameter" });
+    }
+    const grants = await storage.getGrantsByMatch(organizationId, limitNumber);
     res.json(grants);
   });
 
@@ -246,21 +266,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Applications
   app.get("/api/applications/organization/:organizationId", async (req, res) => {
-    const applications = await storage.getApplicationsByOrganization(
-      parseInt(req.params.organizationId)
-    );
+    const organizationId = parseInt(req.params.organizationId);
+    if (isNaN(organizationId)) {
+      return res.status(400).json({ message: "Invalid organization ID" });
+    }
+    const applications = await storage.getApplicationsByOrganization(organizationId);
     res.json(applications);
   });
 
   app.get("/api/applications/user/:userId", async (req, res) => {
-    const applications = await storage.getApplicationsByUser(
-      parseInt(req.params.userId)
-    );
+    const userId = parseInt(req.params.userId);
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+    const applications = await storage.getApplicationsByUser(userId);
     res.json(applications);
   });
 
   app.get("/api/applications/:id", async (req, res) => {
-    const application = await storage.getApplication(parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid application ID" });
+    }
+    const application = await storage.getApplication(id);
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
@@ -288,8 +316,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/applications/:id", async (req, res) => {
     try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid application ID" });
+      }
       const appData = insertApplicationSchema.partial().parse(req.body);
-      const application = await storage.updateApplication(parseInt(req.params.id), appData);
+      const application = await storage.updateApplication(id, appData);
       
       if (!application) {
         return res.status(404).json({ message: "Application not found" });
@@ -302,7 +334,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/applications/:id", async (req, res) => {
-    const deleted = await storage.deleteApplication(parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid application ID" });
+    }
+    const deleted = await storage.deleteApplication(id);
     if (!deleted) {
       return res.status(404).json({ message: "Application not found" });
     }
@@ -311,9 +347,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Documents
   app.get("/api/documents/application/:applicationId", async (req, res) => {
-    const documents = await storage.getDocumentsByApplication(
-      parseInt(req.params.applicationId)
-    );
+    const applicationId = parseInt(req.params.applicationId);
+    if (isNaN(applicationId)) {
+      return res.status(400).json({ message: "Invalid application ID" });
+    }
+    const documents = await storage.getDocumentsByApplication(applicationId);
     res.json(documents);
   });
 
@@ -329,9 +367,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Suggestions
   app.get("/api/ai-suggestions/application/:applicationId", async (req, res) => {
-    const suggestions = await storage.getAiSuggestionsByApplication(
-      parseInt(req.params.applicationId)
-    );
+    const applicationId = parseInt(req.params.applicationId);
+    if (isNaN(applicationId)) {
+      return res.status(400).json({ message: "Invalid application ID" });
+    }
+    const suggestions = await storage.getAiSuggestionsByApplication(applicationId);
     res.json(suggestions);
   });
 
