@@ -13,6 +13,32 @@ import {
 } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication routes
+  app.get("/api/auth/user", async (req, res) => {
+    // For now, return mock user data for development
+    // In production, this would check session/token
+    const mockUser = {
+      id: 1,
+      email: "user@example.com",
+      username: "demo_user",
+      organizationId: 1,
+      role: "user"
+    };
+    res.json(mockUser);
+  });
+
+  app.get("/api/login", (req, res) => {
+    // Redirect to actual login implementation
+    // For now, redirect to home since we're using mock auth
+    res.redirect("/");
+  });
+
+  app.get("/api/logout", (req, res) => {
+    // Clear session/token and redirect to landing
+    // For now, just redirect to root which will show landing page
+    res.redirect("/");
+  });
+
   // Users
   app.get("/api/users/:id", async (req, res) => {
     const user = await storage.getUser(parseInt(req.params.id));
