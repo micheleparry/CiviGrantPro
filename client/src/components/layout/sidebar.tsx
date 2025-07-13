@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
   Home, Search, Edit, Bot, TrendingUp, FolderOpen, 
-  Lightbulb, Trophy, Target
+  Lightbulb, Trophy, Target, Brain
 } from "lucide-react";
 
 const navigation = [
@@ -10,6 +10,7 @@ const navigation = [
   { name: "Find Grants", href: "/grants", icon: Search, current: false },
   { name: "Applications", href: "/applications", icon: Edit, current: false },
   { name: "AI Assistant", href: "/ai-assistant", icon: Bot, current: false },
+  { name: "AI Intelligence", href: "/ai-intelligence", icon: Brain, current: false },
   { name: "Progress", href: "/progress", icon: TrendingUp, current: false },
   { name: "Documents", href: "/documents", icon: FolderOpen, current: false },
 ];
@@ -59,11 +60,13 @@ export default function Sidebar() {
                           ? "text-warm-orange"
                           : item.name === "AI Assistant"
                             ? "text-deep-blue"
-                            : item.name === "Progress"
-                              ? "text-forest-green"
-                              : item.name === "Documents"
-                                ? "text-deep-orange"
-                                : "text-slate-500"
+                            : item.name === "AI Intelligence"
+                              ? "text-vibrant-purple"
+                              : item.name === "Progress"
+                                ? "text-forest-green"
+                                : item.name === "Documents"
+                                  ? "text-deep-orange"
+                                  : "text-slate-500"
                   )}
                 />
                 <span>{item.name}</span>
