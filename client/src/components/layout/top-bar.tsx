@@ -10,8 +10,10 @@ export default function TopBar() {
   const { user } = useAuth();
   
   const handleLogout = async () => {
-    // Clear React Query cache
+    // Clear React Query cache first
     queryClient.clear();
+    // Add a small delay to ensure cache is cleared
+    await new Promise(resolve => setTimeout(resolve, 100));
     // Navigate to logout endpoint
     window.location.href = "/api/logout";
   };
