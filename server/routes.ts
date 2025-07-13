@@ -12,10 +12,10 @@ import {
   analyzeDocumentRequirements, generateApplicationSection
 } from "./services/openai";
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // Simple session store for demo purposes
-  let isUserLoggedIn = true;
+// Simple session store for demo purposes
+let isUserLoggedIn = true;
 
+export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get("/api/auth/user", async (req, res) => {
     // Check if user is logged in

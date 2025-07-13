@@ -4,11 +4,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { queryClient } from "@/lib/queryClient";
 
 export default function TopBar() {
   const { user } = useAuth();
   
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Clear React Query cache
+    queryClient.clear();
+    // Navigate to logout endpoint
     window.location.href = "/api/logout";
   };
 
