@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(240, 20%, 99%);
+  --foreground: hsl(240, 10%, 4%);
+  --muted: hsl(240, 5%, 96%);
+  --muted-foreground: hsl(240, 4%, 46%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 4%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 4%);
+  --border: hsl(240, 6%, 90%);
+  --input: hsl(240, 6%, 90%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(240, 5%, 96%);
+  --secondary-foreground: hsl(240, 6%, 10%);
+  --accent: hsl(240, 5%, 96%);
+  --accent-foreground: hsl(240, 6%, 10%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(217, 91%, 60%);
+  --radius: 0.75rem;
+  
+  /* Custom bright colors */
+  --vibrant-blue: hsl(217, 91%, 60%);
+  --deep-blue: hsl(217, 91%, 35%);
+  --energetic-green: hsl(158, 64%, 52%);
+  --forest-green: hsl(158, 64%, 40%);
+  --warm-orange: hsl(38, 92%, 50%);
+  --deep-orange: hsl(38, 92%, 40%);
+  --bright-purple: hsl(258, 90%, 66%);
+  --deep-purple: hsl(258, 90%, 50%);
+  --sunny-yellow: hsl(48, 100%, 67%);
+  --golden-yellow: hsl(48, 100%, 50%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 4%, 16%);
+  --muted-foreground: hsl(240, 5%, 65%);
+  --popover: hsl(240, 10%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 4%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 4%, 16%);
+  --input: hsl(240, 4%, 16%);
+  --primary: hsl(217, 91%, 60%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(240, 4%, 16%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 4%, 16%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(217, 91%, 60%);
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  .vibrant-blue {
+    color: var(--vibrant-blue);
+  }
+
+  .bg-vibrant-blue {
+    background-color: var(--vibrant-blue);
+  }
+
+  .border-vibrant-blue {
+    border-color: var(--vibrant-blue);
+  }
+
+  .text-vibrant-blue {
+    color: var(--vibrant-blue);
+  }
+
+  .hover\:bg-vibrant-blue:hover {
+    background-color: var(--vibrant-blue);
+  }
+
+  .energetic-green {
+    color: var(--energetic-green);
+  }
+
+  .bg-energetic-green {
+    background-color: var(--energetic-green);
+  }
+
+  .border-energetic-green {
+    border-color: var(--energetic-green);
+  }
+
+  .text-energetic-green {
+    color: var(--energetic-green);
+  }
+
+  .hover\:bg-energetic-green:hover {
+    background-color: var(--energetic-green);
+  }
+
+  .warm-orange {
+    color: var(--warm-orange);
+  }
+
+  .bg-warm-orange {
+    background-color: var(--warm-orange);
+  }
+
+  .border-warm-orange {
+    border-color: var(--warm-orange);
+  }
+
+  .text-warm-orange {
+    color: var(--warm-orange);
+  }
+
+  .hover\:bg-warm-orange:hover {
+    background-color: var(--warm-orange);
+  }
+
+  .deep-blue {
+    color: var(--deep-blue);
+  }
+
+  .bg-deep-blue {
+    background-color: var(--deep-blue);
+  }
+
+  .border-deep-blue {
+    border-color: var(--deep-blue);
+  }
+
+  .text-deep-blue {
+    color: var(--deep-blue);
+  }
+
+  .hover\:bg-deep-blue:hover {
+    background-color: var(--deep-blue);
+  }
+
+  .forest-green {
+    color: var(--forest-green);
+  }
+
+  .bg-forest-green {
+    background-color: var(--forest-green);
+  }
+
+  .border-forest-green {
+    border-color: var(--forest-green);
+  }
+
+  .text-forest-green {
+    color: var(--forest-green);
+  }
+
+  .hover\:bg-forest-green:hover {
+    background-color: var(--forest-green);
+  }
+
+  .deep-orange {
+    color: var(--deep-orange);
+  }
+
+  .bg-deep-orange {
+    background-color: var(--deep-orange);
+  }
+
+  .border-deep-orange {
+    border-color: var(--deep-orange);
+  }
+
+  .text-deep-orange {
+    color: var(--deep-orange);
+  }
+
+  .hover\:bg-deep-orange:hover {
+    background-color: var(--deep-orange);
+  }
+
+  .gradient-vibrant {
+    background: linear-gradient(135deg, var(--vibrant-blue), var(--energetic-green));
+  }
+
+  .gradient-warm {
+    background: linear-gradient(135deg, var(--warm-orange), var(--deep-orange));
+  }
+
+  .gradient-cool {
+    background: linear-gradient(135deg, var(--deep-blue), var(--vibrant-blue));
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-bounce-subtle {
+    animation: bounceSubtle 2s infinite;
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .box-shadow-vibrant {
+    box-shadow: 0 4px 20px hsla(217, 91%, 60%, 0.3);
+  }
+
+  .box-shadow-warm {
+    box-shadow: 0 4px 20px hsla(38, 92%, 50%, 0.3);
+  }
+
+  .box-shadow-green {
+    box-shadow: 0 4px 20px hsla(158, 64%, 52%, 0.3);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceSubtle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}
