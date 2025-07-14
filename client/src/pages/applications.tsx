@@ -3,12 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import ProgressBar from "@/components/dashboard/progress-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, Calendar, DollarSign, TrendingUp, 
   Plus, Edit, Eye, Trash2, Clock, CheckCircle,
-  AlertCircle, XCircle
+  AlertCircle, XCircle, Upload
 } from "lucide-react";
 import { Application, Grant } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -18,15 +23,44 @@ const CURRENT_ORG_ID = 1;
 export default function Applications() {
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("all");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newApplication, setNewApplication] = useState({
+    title: "",
+    grantId: "",
+    description: "",
+    priority: "medium"
+  });
 
   const { data: applications, isLoading } = useQuery<Application[]>({
     queryKey: ["/api/applications/organization", CURRENT_ORG_ID],
   });
 
   const handleCreateApplication = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveApplication = () => {
+    if (!newApplication.title || !newApplication.grantId) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // For now, just show success message - would integrate with API later
     toast({
-      title: "New Application 🎉",
-      description: "Starting application wizard...",
+      title: "Application Created",
+      description: `New application "${newApplication.title}" has been created successfully!`,
+    });
+    
+    setIsDialogOpen(false);
+    setNewApplication({
+      title: "",
+      grantId: "",
+      description: "",
+      priority: "medium"
     });
   };
 
@@ -117,25 +151,121 @@ export default function Applications() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in px-4 sm:px-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 flex items-center">
-            <FileText className="mr-3 text-vibrant-blue" size={32} />
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center">
+            <FileText className="mr-3 text-vibrant-blue" size={28} />
             Grant Applications
           </h1>
-          <p className="text-slate-600 mt-2">
+          <p className="text-slate-600 mt-2 text-sm sm:text-base">
             Manage your grant applications and track progress
           </p>
         </div>
-        <Button 
-          onClick={handleCreateApplication}
-          className="bg-energetic-green hover:bg-forest-green text-white"
-        >
-          <Plus className="mr-2" size={16} />
-          New Application
-        </Button>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              onClick={handleCreateApplication}
+              className="bg-energetic-green hover:bg-forest-green text-white w-full sm:w-auto"
+            >
+              <Plus className="mr-2" size={16} />
+              New Application
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-slate-800">
+                Create New Grant Application
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Application Title *</Label>
+                <Input
+                  id="title"
+                  placeholder="Enter application title"
+                  value={newApplication.title}
+                  onChange={(e) => setNewApplication({...newApplication, title: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="grant">Grant Opportunity *</Label>
+                <Select 
+                  value={newApplication.grantId} 
+                  onValueChange={(value) => setNewApplication({...newApplication, grantId: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a grant opportunity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Community Health Innovation Grant</SelectItem>
+                    <SelectItem value="2">Education Technology Fund</SelectItem>
+                    <SelectItem value="3">Environmental Conservation Initiative</SelectItem>
+                    <SelectItem value="4">Youth Development Program</SelectItem>
+                    <SelectItem value="5">Arts & Culture Support Grant</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="priority">Priority Level</Label>
+                <Select 
+                  value={newApplication.priority} 
+                  onValueChange={(value) => setNewApplication({...newApplication, priority: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Brief description of your application approach..."
+                  value={newApplication.description}
+                  onChange={(e) => setNewApplication({...newApplication, description: e.target.value})}
+                  rows={3}
+                />
+              </div>
+
+              <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
+                <Upload className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+                <p className="text-slate-600 mb-2">Upload supporting documents</p>
+                <p className="text-sm text-slate-500">
+                  Drag and drop files here, or click to browse
+                </p>
+                <Button variant="outline" className="mt-3">
+                  <Upload className="mr-2" size={16} />
+                  Choose Files
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSaveApplication}
+                className="bg-energetic-green hover:bg-forest-green text-white"
+              >
+                Create Application
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Statistics */}
