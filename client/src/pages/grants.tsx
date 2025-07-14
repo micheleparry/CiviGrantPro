@@ -62,21 +62,21 @@ export default function Grants() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 flex items-center">
-            <Target className="mr-3 text-vibrant-blue" size={32} />
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center">
+            <Target className="mr-3 text-vibrant-blue" size={28} />
             Grant Opportunities
           </h1>
-          <p className="text-slate-600 mt-2">
+          <p className="text-slate-600 mt-2 text-sm sm:text-base">
             Discover funding opportunities perfectly matched to your mission
           </p>
         </div>
-        <div className="flex items-center space-x-4">
-          <Badge variant="outline" className="border-energetic-green text-energetic-green">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <Badge variant="outline" className="border-energetic-green text-energetic-green text-xs sm:text-sm">
             {filteredGrants?.length || 0} opportunities
           </Badge>
-          <Badge variant="outline" className="border-warm-orange text-warm-orange">
+          <Badge variant="outline" className="border-warm-orange text-warm-orange text-xs sm:text-sm">
             ${(totalFunding / 1000000).toFixed(1)}M total funding
           </Badge>
         </div>
@@ -91,10 +91,10 @@ export default function Grants() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="sm:col-span-2">
               <Input
-                placeholder="Search grants by title, description, or funder..."
+                placeholder="Search grants..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full"
@@ -127,13 +127,13 @@ export default function Grants() {
       </Card>
 
       {/* Grant Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         <Card className="shadow-sm border-l-4 border-energetic-green">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-600 text-sm font-medium">High Match Grants</p>
-                <p className="text-2xl font-bold text-slate-800 mt-1">
+                <p className="text-slate-600 text-xs sm:text-sm font-medium">High Match Grants</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-800 mt-1">
                   {filteredGrants?.filter(g => (g.matchPercentage || 0) >= 85).length || 0}
                 </p>
               </div>
@@ -145,11 +145,11 @@ export default function Grants() {
         </Card>
 
         <Card className="shadow-sm border-l-4 border-warm-orange">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-600 text-sm font-medium">Closing Soon</p>
-                <p className="text-2xl font-bold text-slate-800 mt-1">
+                <p className="text-slate-600 text-xs sm:text-sm font-medium">Closing Soon</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-800 mt-1">
                   {filteredGrants?.filter(g => {
                     const daysUntilDeadline = Math.ceil((new Date(g.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                     return daysUntilDeadline <= 30;
@@ -164,12 +164,12 @@ export default function Grants() {
         </Card>
 
         <Card className="shadow-sm border-l-4 border-deep-blue">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-600 text-sm font-medium">Large Grants</p>
-                <p className="text-2xl font-bold text-slate-800 mt-1">
-                  {filteredGrants?.filter(g => g.amount >= 500000).length || 0}
+                <p className="text-slate-600 text-xs sm:text-sm font-medium">Large Grants</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-800 mt-1">
+                  {filteredGrants?.filter(g => g.amount >= 50000).length || 0}
                 </p>
               </div>
               <div className="w-10 h-10 bg-deep-blue/10 rounded-lg flex items-center justify-center">
@@ -183,10 +183,12 @@ export default function Grants() {
       {/* Grant Results */}
       <Card className="shadow-sm border-t-4 border-forest-green">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-slate-800 flex items-center">
-            <Filter className="mr-2" size={20} />
-            Grant Opportunities
-            <Badge variant="outline" className="ml-3 border-forest-green text-forest-green">
+          <CardTitle className="text-lg sm:text-xl font-bold text-slate-800 flex flex-wrap items-center gap-2">
+            <div className="flex items-center">
+              <Filter className="mr-2" size={20} />
+              Grant Opportunities
+            </div>
+            <Badge variant="outline" className="border-forest-green text-forest-green text-xs sm:text-sm">
               {filteredGrants?.length || 0} results
             </Badge>
           </CardTitle>

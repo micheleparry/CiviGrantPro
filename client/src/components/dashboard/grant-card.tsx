@@ -38,7 +38,7 @@ export default function GrantCard({ grant, onApply }: GrantCardProps) {
   return (
     <Card className="border border-slate-200 hover:border-vibrant-blue transition-colors animate-fade-in">
       <CardContent className="p-4">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-2">
               <Badge 
@@ -53,7 +53,7 @@ export default function GrantCard({ grant, onApply }: GrantCardProps) {
                 {formatDeadline(grant.deadline)}
               </span>
             </div>
-            <h4 className="font-semibold text-slate-800 mb-1">{grant.title}</h4>
+            <h4 className="font-semibold text-slate-800 mb-1 text-base sm:text-lg">{grant.title}</h4>
             <p className="text-slate-600 text-sm mb-2">
               {grant.funder} • {formatAmount(grant.amount)}
               {grant.maxAmount && ` - ${formatAmount(grant.maxAmount)}`}
@@ -64,7 +64,8 @@ export default function GrantCard({ grant, onApply }: GrantCardProps) {
           </div>
           <Button 
             onClick={() => onApply(grant.id)}
-            className="bg-vibrant-blue hover:bg-deep-blue text-white ml-4"
+            className="bg-vibrant-blue hover:bg-deep-blue text-white w-full sm:w-auto sm:ml-4"
+            size="sm"
           >
             Apply Now
           </Button>
