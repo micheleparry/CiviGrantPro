@@ -83,13 +83,25 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
-      <Sidebar />
-      <div className="flex-1 overflow-hidden">
+    <div className="min-h-screen bg-slate-50">
+      {/* Desktop Layout */}
+      <div className="hidden md:flex">
+        <Sidebar />
+        <div className="flex-1 overflow-hidden">
+          <TopBar />
+          <main className="p-6 overflow-y-auto h-full">
+            <Router />
+          </main>
+        </div>
+      </div>
+      
+      {/* Mobile Layout */}
+      <div className="md:hidden">
         <TopBar />
-        <main className="p-6 overflow-y-auto h-full">
+        <main className="p-4 pb-20 overflow-y-auto">
           <Router />
         </main>
+        <Sidebar />
       </div>
     </div>
   );

@@ -10,7 +10,6 @@ interface GrantCardProps {
 }
 
 export default function GrantCard({ grant, onApply }: GrantCardProps) {
-  console.log('Rendering grant card for:', grant.title);
   const formatAmount = (amount: number) => {
     if (amount >= 1000000) {
       return `$${(amount / 1000000).toFixed(1)}M`;

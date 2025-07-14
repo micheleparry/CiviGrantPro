@@ -195,10 +195,6 @@ export default function Grants() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
-            Debug: Raw grants: {grants?.length || 0}, Filtered: {filteredGrants.length}, 
-            Search: "{searchTerm}", Status: {statusFilter}, Focus: {focusAreaFilter}
-          </div>
           {filteredGrants.length === 0 ? (
             <div className="text-center py-12">
               <Search className="mx-auto h-12 w-12 text-slate-400 mb-4" />
@@ -209,17 +205,12 @@ export default function Grants() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredGrants.map((grant, index) => (
-                <div key={grant.id} className="border border-red-300 bg-red-50 p-4 rounded">
-                  <div className="text-sm mb-2 font-bold">Grant #{index + 1}: {grant.title}</div>
-                  <div className="text-xs text-gray-600 mb-2">
-                    Funder: {grant.funder} | Amount: ${grant.amount.toLocaleString()}
-                  </div>
-                  <GrantCard 
-                    grant={grant} 
-                    onApply={handleApplyToGrant} 
-                  />
-                </div>
+              {filteredGrants.map((grant) => (
+                <GrantCard 
+                  key={grant.id} 
+                  grant={grant} 
+                  onApply={handleApplyToGrant} 
+                />
               ))}
             </div>
           )}
