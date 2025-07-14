@@ -12,19 +12,19 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Welcome Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+      <div className="text-center space-y-3 sm:space-y-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-200">
           Welcome to CiviGrantAI
         </h1>
-        <p className="text-xl text-gray-600">
+        <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 px-4 sm:px-0">
           {user?.email ? `Welcome back, ${user.email}!` : "Welcome back!"} Ready to create winning grant proposals?
         </p>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Link href="/grants">
           <Card className="cursor-pointer hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <CardHeader className="pb-3">
@@ -83,7 +83,7 @@ export default function Home() {
       </div>
 
       {/* Dashboard Stats */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-white shadow-lg">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -175,27 +175,27 @@ export default function Home() {
 
       {/* Getting Started */}
       <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold mb-2">Ready to Get Started?</h3>
-              <p className="text-blue-100 mb-4">
+        <CardContent className="p-4 sm:p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex-1">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Ready to Get Started?</h3>
+              <p className="text-blue-100 mb-4 sm:mb-6 text-sm sm:text-base leading-relaxed">
                 Use our AI-powered tools to create winning grant proposals that align with funder priorities.
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link href="/grants">
-                  <Button variant="secondary" className="bg-white text-blue-600 hover:bg-blue-50">
+                  <Button variant="secondary" className="bg-white text-blue-600 hover:bg-blue-50 w-full sm:w-auto">
                     Find Grants
                   </Button>
                 </Link>
                 <Link href="/ai-intelligence">
-                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 w-full sm:w-auto">
                     Try AlignIQ Blueprint
                   </Button>
                 </Link>
               </div>
             </div>
-            <div className="hidden md:block">
+            <div className="hidden md:block flex-shrink-0">
               <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center">
                 <Brain className="w-16 h-16 text-white" />
               </div>
