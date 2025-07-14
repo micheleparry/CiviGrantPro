@@ -164,40 +164,40 @@ export default function AiIntelligence() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          AI Intelligence Hub
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-200">
+          AlignIQ Blueprint
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
           Advanced grant writing intelligence powered by AI analysis
         </p>
       </div>
 
       <Tabs defaultValue="organization" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-0 h-auto lg:h-10">
-          <TabsTrigger value="organization" className="flex items-center gap-2 justify-start px-4 py-3 lg:py-2">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-0 h-auto sm:h-10">
+          <TabsTrigger value="organization" className="flex items-center gap-2 justify-center sm:justify-start px-3 py-3 sm:py-2">
             <Users className="w-4 h-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Organization Intelligence</span>
+            <span className="text-xs sm:text-sm font-medium">Organization Intelligence</span>
           </TabsTrigger>
-          <TabsTrigger value="document" className="flex items-center gap-2 justify-start px-4 py-3 lg:py-2">
+          <TabsTrigger value="document" className="flex items-center gap-2 justify-center sm:justify-start px-3 py-3 sm:py-2">
             <FileText className="w-4 h-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Upload Grant Instructions</span>
+            <span className="text-xs sm:text-sm font-medium">Grant Instructions</span>
           </TabsTrigger>
-          <TabsTrigger value="generation" className="flex items-center gap-2 justify-start px-4 py-3 lg:py-2">
+          <TabsTrigger value="generation" className="flex items-center gap-2 justify-center sm:justify-start px-3 py-3 sm:py-2">
             <Brain className="w-4 h-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Content Generation</span>
+            <span className="text-xs sm:text-sm font-medium">Content Generation</span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="organization" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                <Target className="w-5 h-5 text-vibrant-blue" />
                 Funding Mission and Goals
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-slate-600 dark:text-slate-400">
                 AlignIQ Blueprint is an AI-powered intelligence tool that maps the goals, metrics, priorities, and mission of funding organizations to strategically align your project with their core objectives. It ensures each grant proposal is crafted to fully reflect the funder's strategic vision, increasing alignment, relevance, and the likelihood of a successful award.
               </CardDescription>
             </CardHeader>
@@ -235,7 +235,7 @@ export default function AiIntelligence() {
           {organizationMutation.data && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-600">
+                <CardTitle className="text-energetic-green dark:text-green-400">
                   Intelligence Report: {organizationMutation.data.name}
                 </CardTitle>
               </CardHeader>
@@ -243,7 +243,7 @@ export default function AiIntelligence() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-purple-600 mb-2">Funding Trends</h3>
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Funding Trends</h3>
                       <div className="space-y-1">
                         {organizationMutation.data.fundingTrends.map((trend, idx) => (
                           <button
@@ -252,23 +252,23 @@ export default function AiIntelligence() {
                               setOrganizationName(trend);
                               setGrantTitle(`${trend} Programs`);
                             }}
-                            className="mr-2 mb-2 px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-full border border-purple-300 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-900/40 transition-colors cursor-pointer"
+                            className="mr-2 mb-2 px-3 py-1 text-sm bg-vibrant-blue/10 dark:bg-vibrant-blue/20 text-vibrant-blue dark:text-blue-300 rounded-full border border-vibrant-blue/30 dark:border-blue-600 hover:bg-vibrant-blue/20 dark:hover:bg-vibrant-blue/30 transition-colors cursor-pointer"
                           >
                             {trend}
                             <span className="ml-2 text-xs opacity-70">↗</span>
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
                         Click trends to explore specific funding areas
                       </p>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-blue-600 mb-2">Success Factors</h3>
-                      <ul className="space-y-1 text-sm">
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Success Factors</h3>
+                      <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
                         {organizationMutation.data.successFactors.map((factor, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <CheckCircle className="w-4 h-4 text-energetic-green dark:text-green-400 mt-0.5 flex-shrink-0" />
                             {factor}
                           </li>
                         ))}
@@ -277,11 +277,11 @@ export default function AiIntelligence() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-orange-600 mb-2">Application Tips</h3>
-                      <ul className="space-y-1 text-sm">
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Application Tips</h3>
+                      <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
                         {organizationMutation.data.applicationTips.map((tip, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <Lightbulb className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                            <Lightbulb className="w-4 h-4 text-warm-orange dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                             {tip}
                           </li>
                         ))}
@@ -289,12 +289,12 @@ export default function AiIntelligence() {
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="font-medium">Average Amount</p>
-                        <p className="text-green-600">{organizationMutation.data.averageAmount}</p>
+                        <p className="font-medium text-slate-800 dark:text-slate-200">Average Amount</p>
+                        <p className="text-energetic-green dark:text-green-400">{organizationMutation.data.averageAmount}</p>
                       </div>
                       <div>
-                        <p className="font-medium">Success Rate</p>
-                        <p className="text-blue-600">{organizationMutation.data.successRate}</p>
+                        <p className="font-medium text-slate-800 dark:text-slate-200">Success Rate</p>
+                        <p className="text-vibrant-blue dark:text-blue-400">{organizationMutation.data.successRate}</p>
                       </div>
                     </div>
                   </div>
@@ -307,24 +307,24 @@ export default function AiIntelligence() {
         <TabsContent value="document" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-green-600" />
+              <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                <FileText className="w-5 h-5 text-energetic-green" />
                 Application Package Forms & Analysis
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-slate-600 dark:text-slate-400">
                 Upload or paste grant RFPs, guidelines, and announcements to automatically extract requirements, deadlines, eligibility criteria, and evaluation metrics. Save hours of manual document review.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
-                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-vibrant-blue rounded-full"></div>
                     <span>Paste grant instructions below</span>
                   </div>
-                  <div className="text-gray-400">or</div>
+                  <div className="text-slate-400 dark:text-slate-500">or</div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-energetic-green rounded-full"></div>
                     <span>Upload grant document files</span>
                   </div>
                 </div>
@@ -341,7 +341,7 @@ export default function AiIntelligence() {
                   />
                 </div>
                 
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center">
                   <input
                     type="file"
                     id="fileUpload"
@@ -357,12 +357,12 @@ export default function AiIntelligence() {
                   />
                   <label htmlFor="fileUpload" className="cursor-pointer">
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-vibrant-blue/10 dark:bg-vibrant-blue/20 rounded-full flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-vibrant-blue" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Upload Grant Instructions</p>
-                        <p className="text-xs text-gray-500">PDF, DOC, DOCX, or TXT files</p>
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Upload Grant Instructions</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">PDF, DOC, DOCX, or TXT files</p>
                       </div>
                     </div>
                   </label>
@@ -382,17 +382,17 @@ export default function AiIntelligence() {
           {documentMutation.data && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-600">Document Analysis Results</CardTitle>
+                <CardTitle className="text-energetic-green dark:text-green-400">Document Analysis Results</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-red-600 mb-2">Requirements</h3>
-                      <ul className="space-y-1 text-sm">
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Requirements</h3>
+                      <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
                         {documentMutation.data.requirements.map((req, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                            <span className="w-2 h-2 bg-warm-orange rounded-full mt-2 flex-shrink-0"></span>
                             {req}
                           </li>
                         ))}
