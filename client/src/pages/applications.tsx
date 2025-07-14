@@ -340,44 +340,44 @@ export default function Applications() {
         </CardHeader>
         <CardContent>
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="draft">Draft</TabsTrigger>
-              <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-              <TabsTrigger value="submitted">Submitted</TabsTrigger>
-              <TabsTrigger value="under_review">Under Review</TabsTrigger>
-              <TabsTrigger value="approved">Approved</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1">
+              <TabsTrigger value="all" className="text-xs sm:text-sm">All</TabsTrigger>
+              <TabsTrigger value="draft" className="text-xs sm:text-sm">Draft</TabsTrigger>
+              <TabsTrigger value="in_progress" className="text-xs sm:text-sm">Progress</TabsTrigger>
+              <TabsTrigger value="submitted" className="text-xs sm:text-sm">Submitted</TabsTrigger>
+              <TabsTrigger value="under_review" className="text-xs sm:text-sm">Review</TabsTrigger>
+              <TabsTrigger value="approved" className="text-xs sm:text-sm">Approved</TabsTrigger>
             </TabsList>
 
             <TabsContent value={selectedTab} className="mt-6">
               <div className="space-y-4">
                 {applications && filterApplications(applications, selectedTab).map((application) => (
                   <Card key={application.id} className="border border-slate-200 hover:border-vibrant-blue transition-colors">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-3">
-                            <h3 className="text-lg font-semibold text-slate-800">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
+                            <h3 className="text-base sm:text-lg font-semibold text-slate-800 line-clamp-2">
                               {application.title}
                             </h3>
-                            <Badge className={`${getStatusColor(application.status)} flex items-center space-x-1`}>
+                            <Badge className={`${getStatusColor(application.status)} flex items-center space-x-1 shrink-0`}>
                               {getStatusIcon(application.status)}
-                              <span className="capitalize">{application.status.replace("_", " ")}</span>
+                              <span className="capitalize text-xs">{application.status.replace("_", " ")}</span>
                             </Badge>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div className="flex items-center space-x-2 text-sm text-slate-600">
-                              <Calendar size={16} />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-4">
+                            <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-600">
+                              <Calendar size={14} />
                               <span>Created: {formatDate(application.createdAt)}</span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-slate-600">
-                              <Clock size={16} />
+                            <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-600">
+                              <Clock size={14} />
                               <span>Updated: {formatDate(application.updatedAt)}</span>
                             </div>
                             {application.submittedAt && (
-                              <div className="flex items-center space-x-2 text-sm text-slate-600">
-                                <CheckCircle size={16} />
+                              <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-600">
+                                <CheckCircle size={14} />
                                 <span>Submitted: {formatDate(application.submittedAt)}</span>
                               </div>
                             )}
@@ -388,48 +388,49 @@ export default function Applications() {
                               <span className="text-slate-600">Progress</span>
                               <span className="font-semibold text-slate-800">{application.progress}%</span>
                             </div>
-                            <ProgressBar 
-                              label="Progress" 
-                              value={application.progress} 
-                              total={100} 
-                              color="var(--vibrant-blue)" 
-                              className="h-2" 
-                            />
+                            <div className="w-full bg-slate-200 rounded-full h-2">
+                              <div 
+                                className="bg-vibrant-blue h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${application.progress}%` }}
+                              />
+                            </div>
                           </div>
 
                           {application.narrative && (
-                            <p className="text-slate-600 text-sm line-clamp-2">
-                              {application.narrative.substring(0, 200)}...
+                            <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 mt-2">
+                              {application.narrative.substring(0, 150)}...
                             </p>
                           )}
                         </div>
 
-                        <div className="flex flex-col space-y-2 ml-4">
+                        <div className="flex flex-row sm:flex-col gap-2 sm:space-y-2 sm:ml-4">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleViewApplication(application.id)}
+                            className="flex-1 sm:flex-none"
                           >
-                            <Eye size={16} className="mr-1" />
-                            View
+                            <Eye size={14} className="mr-1" />
+                            <span className="hidden sm:inline">View</span>
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleEditApplication(application.id)}
                             disabled={application.status === "submitted"}
+                            className="flex-1 sm:flex-none"
                           >
-                            <Edit size={16} className="mr-1" />
-                            Edit
+                            <Edit size={14} className="mr-1" />
+                            <span className="hidden sm:inline">Edit</span>
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleDeleteApplication(application.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 flex-1 sm:flex-none"
                           >
-                            <Trash2 size={16} className="mr-1" />
-                            Delete
+                            <Trash2 size={14} className="mr-1" />
+                            <span className="hidden sm:inline">Delete</span>
                           </Button>
                         </div>
                       </div>
