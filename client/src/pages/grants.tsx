@@ -43,11 +43,12 @@ export default function Grants() {
     });
   };
 
-  const filteredGrants = grants?.filter(grant => 
-    grant.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    grant.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    grant.funder.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredGrants = grants?.filter(grant => {
+    if (!searchTerm) return true;
+    return grant.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           grant.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           grant.funder.toLowerCase().includes(searchTerm.toLowerCase());
+  }) || [];
 
   const totalFunding = filteredGrants?.reduce((sum, grant) => sum + (grant.maxAmount || grant.amount), 0) || 0;
 
@@ -74,7 +75,7 @@ export default function Grants() {
         </div>
         <div className="flex items-center space-x-2 sm:space-x-4">
           <Badge variant="outline" className="border-energetic-green text-energetic-green text-xs sm:text-sm">
-            {filteredGrants?.length || 0} opportunities
+{filteredGrants.length} opportunities
           </Badge>
           <Badge variant="outline" className="border-warm-orange text-warm-orange text-xs sm:text-sm">
             ${(totalFunding / 1000000).toFixed(1)}M total funding
@@ -134,7 +135,7 @@ export default function Grants() {
               <div>
                 <p className="text-slate-600 text-xs sm:text-sm font-medium">High Match Grants</p>
                 <p className="text-xl sm:text-2xl font-bold text-slate-800 mt-1">
-                  {filteredGrants?.filter(g => (g.matchPercentage || 0) >= 85).length || 0}
+{filteredGrants.filter(g => (g.matchPercentage || 0) >= 85).length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-energetic-green/10 rounded-lg flex items-center justify-center">
@@ -150,10 +151,10 @@ export default function Grants() {
               <div>
                 <p className="text-slate-600 text-xs sm:text-sm font-medium">Closing Soon</p>
                 <p className="text-xl sm:text-2xl font-bold text-slate-800 mt-1">
-                  {filteredGrants?.filter(g => {
+{filteredGrants.filter(g => {
                     const daysUntilDeadline = Math.ceil((new Date(g.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                     return daysUntilDeadline <= 30;
-                  }).length || 0}
+                  }).length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-warm-orange/10 rounded-lg flex items-center justify-center">
@@ -169,7 +170,7 @@ export default function Grants() {
               <div>
                 <p className="text-slate-600 text-xs sm:text-sm font-medium">Large Grants</p>
                 <p className="text-xl sm:text-2xl font-bold text-slate-800 mt-1">
-                  {filteredGrants?.filter(g => g.amount >= 50000).length || 0}
+{filteredGrants.filter(g => g.amount >= 50000).length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-deep-blue/10 rounded-lg flex items-center justify-center">
@@ -189,20 +190,22 @@ export default function Grants() {
               Grant Opportunities
             </div>
             <Badge variant="outline" className="border-forest-green text-forest-green text-xs sm:text-sm">
-              {filteredGrants?.length || 0} results
+{filteredGrants.length} results
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredGrants?.length === 0 ? (
+          {filteredGrants.length === 0 ? (
             <div className="text-center py-12">
               <Search className="mx-auto h-12 w-12 text-slate-400 mb-4" />
               <h3 className="text-lg font-semibold text-slate-600">No grants found</h3>
-              <p className="text-slate-500 mt-2">Try adjusting your search terms or filters</p>
+              <p className="text-slate-500 mt-2">
+                {!grants || grants.length === 0 ? "No grants available" : "Try adjusting your search terms or filters"}
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredGrants?.map((grant) => (
+              {filteredGrants.map((grant) => (
                 <GrantCard 
                   key={grant.id} 
                   grant={grant} 

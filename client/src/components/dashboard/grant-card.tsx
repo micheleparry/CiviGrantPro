@@ -19,9 +19,10 @@ export default function GrantCard({ grant, onApply }: GrantCardProps) {
     return `$${amount.toLocaleString()}`;
   };
 
-  const formatDeadline = (deadline: Date) => {
+  const formatDeadline = (deadline: Date | string) => {
     const now = new Date();
-    const diffTime = new Date(deadline).getTime() - now.getTime();
+    const deadlineDate = new Date(deadline);
+    const diffTime = deadlineDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays <= 0) return "Due now";
