@@ -6,6 +6,15 @@ CiviGrantAI is a full-stack web application designed to streamline the grant app
 
 ## Recent Changes
 
+### Mobile Responsive Layout Fix (January 2025)
+- ✅ **Fixed Mobile Grant Display**: Resolved critical issue where grant cards weren't visible on mobile devices
+- ✅ **Responsive Navigation**: Implemented separate desktop sidebar and mobile bottom navigation
+- ✅ **Mobile-First Layout**: Created dedicated mobile layout with proper content spacing
+- ✅ **Grant Cards Mobile Optimization**: Enhanced grant cards for mobile screens with responsive design
+- ✅ **Bottom Navigation Bar**: Added mobile-friendly bottom navigation with key app sections
+- ✅ **Content Padding**: Added proper padding to prevent content from being hidden behind navigation
+- ✅ **Cross-Platform Compatibility**: Ensured consistent user experience across desktop and mobile devices
+
 ### Enhanced Authentication & Notification System (January 2025)
 - ✅ **Fixed Authentication Flow**: Implemented proper login/logout functionality with session management
 - ✅ **Working Notification Bell**: Added fully functional notification system with real-time updates
