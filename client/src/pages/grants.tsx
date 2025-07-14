@@ -18,11 +18,22 @@ const focusAreaOptions = [
 export default function Grants() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [focusAreaFilter, setFocusAreaFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [focusAreaFilter, setFocusAreaFilter] = useState<string>("all");
 
   const { data: grants, isLoading } = useQuery<Grant[]>({
-    queryKey: ["/api/grants", { status: statusFilter, focusAreas: focusAreaFilter }],
+    queryKey: ["/api/grants", statusFilter, focusAreaFilter],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (statusFilter && statusFilter !== "all") params.append('status', statusFilter);
+      if (focusAreaFilter && focusAreaFilter !== "all") params.append('focusAreas', focusAreaFilter);
+      
+      const response = await fetch(`/api/grants?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
   });
 
   const handleApplyToGrant = (grantId: number) => {
@@ -94,7 +105,7 @@ export default function Grants() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="open">Open</SelectItem>
                 <SelectItem value="closing_soon">Closing Soon</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
@@ -105,7 +116,7 @@ export default function Grants() {
                 <SelectValue placeholder="Focus Area" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Areas</SelectItem>
+                <SelectItem value="all">All Areas</SelectItem>
                 {focusAreaOptions.map(area => (
                   <SelectItem key={area} value={area}>{area}</SelectItem>
                 ))}
