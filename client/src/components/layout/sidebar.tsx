@@ -2,12 +2,15 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
   Home, Search, Edit, Bot, TrendingUp, FolderOpen, 
-  Lightbulb, Trophy, Target, Brain
+  Lightbulb, Trophy, Target, Brain, Sparkles, Zap
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home, current: true },
   { name: "Find Grants", href: "/grants", icon: Search, current: false },
+  { name: "Grant Search", href: "/grants-search", icon: Target, current: false },
+  { name: "AI Recommendations", href: "/ai-recommendations", icon: Sparkles, current: false },
+  { name: "NLP Analysis", href: "/nlp-analysis", icon: Zap, current: false },
   { name: "Applications", href: "/applications", icon: Edit, current: false },
   { name: "Smart Narrative Builder", href: "/ai-assistant", icon: Bot, current: false },
   { name: "AlignIQ Blueprint", href: "/ai-intelligence", icon: Brain, current: false },

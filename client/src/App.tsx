@@ -12,8 +12,11 @@ import Grants from "@/pages/grants";
 import Applications from "@/pages/applications";
 import AiAssistant from "@/pages/ai-assistant";
 import AiIntelligence from "@/pages/ai-intelligence";
+import AiRecommendations from "@/pages/ai-recommendations";
+import NlpAnalysis from "@/pages/nlp-analysis";
 import Progress from "@/pages/progress";
 import Documents from "@/pages/documents";
+import GrantsSearch from "@/pages/grants-search";
 import Sidebar from "@/components/layout/sidebar";
 import TopBar from "@/components/layout/top-bar";
 
@@ -41,6 +44,9 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/grants" component={Grants} />
+          <Route path="/grants-search" component={GrantsSearch} />
+          <Route path="/ai-recommendations" component={AiRecommendations} />
+          <Route path="/nlp-analysis" component={NlpAnalysis} />
           <Route path="/applications" component={Applications} />
           <Route path="/ai-assistant" component={AiAssistant} />
           <Route path="/ai-intelligence" component={AiIntelligence} />

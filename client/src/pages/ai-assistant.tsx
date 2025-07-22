@@ -1,545 +1,634 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
-  Bot, Sparkles, FileText, Target, Lightbulb, 
-  Send, RefreshCw, Download, Copy, CheckCircle,
-  TrendingUp, Award, MessageSquare, Zap
+  Brain, Search, TrendingUp, MessageSquare, 
+  Building, MapPin, User, FileText, 
+  Zap, Target, BarChart3, RefreshCw,
+  CheckCircle, AlertTriangle, Info, Star,
+  Globe, Database, Clock, Award,
+  Lightbulb, BookOpen, Users, Calendar
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { AiSuggestion, Application, Grant } from "@shared/schema";
 
-const CURRENT_ORG_ID = 1;
-const CURRENT_USER_ID = 1;
+interface MCPResponse {
+  content: string;
+  tools_used: string[];
+  data_sources: string[];
+  timestamp: string;
+  confidence: number;
+}
 
-const narrativeSections = [
-  { value: "executive_summary", label: "Executive Summary" },
-  { value: "project_description", label: "Project Description" },
-  { value: "methodology", label: "Methodology" },
-  { value: "impact_statement", label: "Impact Statement" },
-  { value: "budget_justification", label: "Budget Justification" },
-  { value: "sustainability", label: "Sustainability Plan" },
-  { value: "evaluation", label: "Evaluation Plan" },
-];
+interface RealTimeData {
+  grants_found: number;
+  current_deadlines: string[];
+  funding_trends: string[];
+  recent_awards: Array<{
+    organization: string;
+    amount: string;
+    project_type: string;
+  }>;
+}
 
-const suggestionTypes = [
-  { value: "narrative", label: "Narrative Improvement" },
-  { value: "budget", label: "Budget Optimization" },
-  { value: "timeline", label: "Timeline Enhancement" },
-  { value: "impact", label: "Impact Amplification" },
-];
-
-export default function AiAssistant() {
+export default function AIAssistant() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
-  const [selectedTab, setSelectedTab] = useState("generate");
-  const [narrativeInput, setNarrativeInput] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
-  const [selectedApplication, setSelectedApplication] = useState("");
-  const [selectedGrant, setSelectedGrant] = useState("");
-  const [generatedNarrative, setGeneratedNarrative] = useState("");
-  const [analysisInput, setAnalysisInput] = useState("");
-  const [selectedSuggestionType, setSelectedSuggestionType] = useState("");
+  const [selectedTab, setSelectedTab] = useState("chat");
+  const [userQuery, setUserQuery] = useState("");
+  const [conversation, setConversation] = useState<Array<{
+    role: "user" | "assistant";
+    content: string;
+    timestamp: string;
+    tools_used?: string[];
+    data_sources?: string[];
+  }>>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [realTimeData, setRealTimeData] = useState<RealTimeData | null>(null);
 
-  const { data: applications } = useQuery<Application[]>({
-    queryKey: ["/api/applications/organization", CURRENT_ORG_ID],
-  });
-
-  const { data: grants } = useQuery<Grant[]>({
-    queryKey: ["/api/grants"],
-  });
-
-  const { data: suggestions } = useQuery<AiSuggestion[]>({
-    queryKey: ["/api/ai-suggestions/application", selectedApplication],
-    enabled: !!selectedApplication,
-  });
-
-  const generateNarrativeMutation = useMutation({
-    mutationFn: async (data: {
-      grantDescription: string;
-      organizationProfile: string;
-      projectDescription: string;
-      section: string;
-    }) => {
-      const response = await apiRequest("POST", "/api/ai/generate-narrative", data);
+  // MCP-enhanced AI assistant mutation
+  const mcpAssistantMutation = useMutation({
+    mutationFn: async (query: string) => {
+      const response = await apiRequest("POST", "/api/ai/mcp-assistant", {
+        query,
+        context: {
+          organizationProfile: "Sample Nonprofit Organization",
+          focusAreas: ["Education", "Community Development", "Youth Programs"],
+          currentApplication: null
+        }
+      });
       return response.json();
     },
-    onSuccess: (data) => {
-      setGeneratedNarrative(data.narrative);
+    onSuccess: (data: MCPResponse) => {
+      const newMessage = {
+        role: "assistant" as const,
+        content: data.content,
+        timestamp: new Date().toISOString(),
+        tools_used: data.tools_used,
+        data_sources: data.data_sources
+      };
+      
+      setConversation(prev => [...prev, newMessage]);
+      
       toast({
-        title: "Narrative Generated! ✨",
-        description: "Your AI-powered narrative is ready for review.",
+        title: "AI Response Generated! 🤖",
+        description: `Used ${data.tools_used.length} tools and ${data.data_sources.length} data sources.`,
       });
     },
     onError: (error) => {
       toast({
-        title: "Generation Failed",
+        title: "AI Assistant Error",
         description: error.message,
         variant: "destructive",
       });
     },
+    onSettled: () => {
+      setIsProcessing(false);
+    }
   });
 
-  const generateSuggestionsMutation = useMutation({
-    mutationFn: async (data: {
-      applicationContent: string;
-      grantRequirements: string;
-      suggestionType: string;
-    }) => {
-      const response = await apiRequest("POST", "/api/ai/generate-suggestions", data);
+  // Real-time data fetch mutation
+  const realTimeDataMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("GET", "/api/ai/real-time-data");
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: RealTimeData) => {
+      setRealTimeData(data);
       toast({
-        title: "Suggestions Generated! 💡",
-        description: `Generated ${data.suggestions.length} helpful suggestions.`,
-      });
-      queryClient.invalidateQueries({ 
-        queryKey: ["/api/ai-suggestions/application", selectedApplication] 
+        title: "Real-time Data Updated! 📊",
+        description: `Found ${data.grants_found} current opportunities.`,
       });
     },
     onError: (error) => {
       toast({
-        title: "Suggestion Generation Failed",
+        title: "Data Update Failed",
         description: error.message,
         variant: "destructive",
       });
-    },
+    }
   });
 
-  const analyzeGrantMutation = useMutation({
-    mutationFn: async (data: {
-      grantDescription: string;
-      organizationProfile: string;
-      focusAreas: string[];
-    }) => {
-      const response = await apiRequest("POST", "/api/ai/analyze-grant-match", data);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Analysis Complete! 🎯",
-        description: `Match score: ${data.matchPercentage}% - ${data.alignment}`,
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Analysis Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userQuery.trim()) return;
 
-  const handleGenerateNarrative = () => {
-    if (!selectedGrant || !selectedSection || !narrativeInput) {
-      toast({
-        title: "Missing Information",
-        description: "Please select a grant, section, and provide project description.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const userMessage = {
+      role: "user" as const,
+      content: userQuery,
+      timestamp: new Date().toISOString()
+    };
 
-    const selectedGrantData = grants?.find(g => g.id === parseInt(selectedGrant));
-    if (!selectedGrantData) return;
+    setConversation(prev => [...prev, userMessage]);
+    setIsProcessing(true);
+    setUserQuery("");
 
-    generateNarrativeMutation.mutate({
-      grantDescription: selectedGrantData.description,
-      organizationProfile: "Community Health Initiative - Supporting community health programs across underserved areas",
-      projectDescription: narrativeInput,
-      section: selectedSection,
-    });
+    await mcpAssistantMutation.mutateAsync(userQuery);
   };
 
-  const handleGenerateSuggestions = () => {
-    if (!selectedApplication || !selectedSuggestionType || !analysisInput) {
-      toast({
-        title: "Missing Information",
-        description: "Please select an application, suggestion type, and provide content.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    generateSuggestionsMutation.mutate({
-      applicationContent: analysisInput,
-      grantRequirements: "Grant requirements will be fetched from selected application",
-      suggestionType: selectedSuggestionType,
-    });
+  const handleRealTimeUpdate = () => {
+    realTimeDataMutation.mutate();
   };
 
-  const handleCopyNarrative = async () => {
-    if (generatedNarrative) {
-      await navigator.clipboard.writeText(generatedNarrative);
-      toast({
-        title: "Copied! 📋",
-        description: "Narrative copied to clipboard.",
-      });
-    }
-  };
+  const exampleQueries = [
+    "What are the latest grant opportunities for education programs?",
+    "Analyze this RFP document for key requirements and deadlines",
+    "What are the current funding trends in healthcare?",
+    "Help me validate my application against funder requirements",
+    "Find recent successful applications in my sector",
+    "What are the eligibility criteria for Department of Education grants?"
+  ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
+    <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 flex items-center">
-            <Bot className="mr-3 text-deep-blue" size={32} />
-            AI Writing Assistant
-          </h1>
-          <p className="text-slate-600 mt-2">
-            Leverage AI to craft compelling grant narratives and optimize your applications
+          <h1 className="text-3xl font-bold">AI Assistant with MCP</h1>
+          <p className="text-muted-foreground">
+            Enhanced AI assistant with real-time data access and intelligent tools
           </p>
         </div>
-        <div className="flex items-center space-x-4">
-          <Badge variant="outline" className="border-deep-blue text-deep-blue">
-            <Sparkles className="mr-1" size={14} />
-            GPT-4o Powered
-          </Badge>
-          <Badge variant="outline" className="border-energetic-green text-energetic-green">
-            <Zap className="mr-1" size={14} />
-            Real-time
-          </Badge>
-        </div>
+        <Button 
+          onClick={handleRealTimeUpdate}
+          disabled={realTimeDataMutation.isPending}
+          variant="outline"
+        >
+          <RefreshCw className={`w-4 h-4 mr-2 ${realTimeDataMutation.isPending ? 'animate-spin' : ''}`} />
+          Update Real-time Data
+        </Button>
       </div>
 
-      {/* AI Assistant Tabs */}
-      <Card className="shadow-sm border-t-4 border-deep-blue">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-slate-800 flex items-center">
-            <MessageSquare className="mr-2" size={20} />
-            AI Writing Tools
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="generate">Generate Narrative</TabsTrigger>
-              <TabsTrigger value="suggestions">Get Suggestions</TabsTrigger>
-              <TabsTrigger value="analyze">Analyze Match</TabsTrigger>
-            </TabsList>
+      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="chat" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            AI Chat
+          </TabsTrigger>
+          <TabsTrigger value="tools" className="flex items-center gap-2">
+            <Zap className="w-4 h-4" />
+            Available Tools
+          </TabsTrigger>
+          <TabsTrigger value="data" className="flex items-center gap-2">
+            <Database className="w-4 h-4" />
+            Real-time Data
+          </TabsTrigger>
+        </TabsList>
 
-            {/* Generate Narrative Tab */}
-            <TabsContent value="generate" className="mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Select Grant Opportunity
-                    </label>
-                    <Select value={selectedGrant} onValueChange={setSelectedGrant}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a grant..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {grants?.map(grant => (
-                          <SelectItem key={grant.id} value={grant.id.toString()}>
-                            {grant.title} - {grant.funder}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Narrative Section
-                    </label>
-                    <Select value={selectedSection} onValueChange={setSelectedSection}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose section..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {narrativeSections.map(section => (
-                          <SelectItem key={section.value} value={section.value}>
-                            {section.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Project Description
-                    </label>
-                    <Textarea
-                      placeholder="Describe your project, goals, and approach..."
-                      value={narrativeInput}
-                      onChange={(e) => setNarrativeInput(e.target.value)}
-                      rows={6}
-                    />
-                  </div>
-
-                  <Button 
-                    onClick={handleGenerateNarrative}
-                    disabled={generateNarrativeMutation.isPending}
-                    className="w-full bg-deep-blue hover:bg-vibrant-blue text-white"
-                  >
-                    {generateNarrativeMutation.isPending ? (
-                      <>
-                        <RefreshCw className="mr-2 animate-spin" size={16} />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-2" size={16} />
-                        Generate Narrative
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-slate-800">Generated Narrative</h3>
-                    {generatedNarrative && (
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={handleCopyNarrative}
-                        >
-                          <Copy size={14} className="mr-1" />
-                          Copy
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => toast({ title: "Export feature coming soon!" })}
-                        >
-                          <Download size={14} className="mr-1" />
-                          Export
-                        </Button>
+        <TabsContent value="chat" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Chat Interface */}
+            <div className="lg:col-span-2 space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5" />
+                    AI Assistant Chat
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-96 w-full border rounded-md p-4">
+                    {conversation.length === 0 ? (
+                      <div className="text-center text-muted-foreground py-8">
+                        <Brain className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>Start a conversation with your AI assistant</p>
+                        <p className="text-sm">Ask about grants, analyze documents, or get real-time insights</p>
                       </div>
-                    )}
-                  </div>
-                  
-                  <Card className="border-2 border-dashed border-slate-200">
-                    <CardContent className="p-4">
-                      {generatedNarrative ? (
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-2 text-energetic-green">
-                            <CheckCircle size={16} />
-                            <span className="text-sm font-medium">Narrative Generated Successfully!</span>
+                    ) : (
+                      <div className="space-y-4">
+                        {conversation.map((message, index) => (
+                          <div
+                            key={index}
+                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                          >
+                            <div
+                              className={`max-w-[80%] rounded-lg p-3 ${
+                                message.role === "user"
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted"
+                              }`}
+                            >
+                              <p className="text-sm">{message.content}</p>
+                              {message.tools_used && message.tools_used.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {message.tools_used.map((tool, toolIndex) => (
+                                    <Badge key={toolIndex} variant="secondary" className="text-xs">
+                                      {tool}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                              {message.data_sources && message.data_sources.length > 0 && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  Sources: {message.data_sources.join(", ")}
+                                </div>
+                              )}
+                              <div className="mt-1 text-xs opacity-70">
+                                {new Date(message.timestamp).toLocaleTimeString()}
+                              </div>
+                            </div>
                           </div>
-                          <ScrollArea className="h-64">
-                            <p className="text-slate-700 whitespace-pre-wrap">
-                              {generatedNarrative}
-                            </p>
-                          </ScrollArea>
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 text-slate-500">
-                          <FileText className="mx-auto mb-2" size={32} />
-                          <p>Generated narrative will appear here</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Suggestions Tab */}
-            <TabsContent value="suggestions" className="mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Select Application
-                    </label>
-                    <Select value={selectedApplication} onValueChange={setSelectedApplication}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose an application..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {applications?.map(app => (
-                          <SelectItem key={app.id} value={app.id.toString()}>
-                            {app.title}
-                          </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Suggestion Type
-                    </label>
-                    <Select value={selectedSuggestionType} onValueChange={setSelectedSuggestionType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose type..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {suggestionTypes.map(type => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Content to Analyze
-                    </label>
-                    <Textarea
-                      placeholder="Paste your application content here for AI analysis..."
-                      value={analysisInput}
-                      onChange={(e) => setAnalysisInput(e.target.value)}
-                      rows={8}
-                    />
-                  </div>
-
-                  <Button 
-                    onClick={handleGenerateSuggestions}
-                    disabled={generateSuggestionsMutation.isPending}
-                    className="w-full bg-warm-orange hover:bg-deep-orange text-white"
-                  >
-                    {generateSuggestionsMutation.isPending ? (
-                      <>
-                        <RefreshCw className="mr-2 animate-spin" size={16} />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Lightbulb className="mr-2" size={16} />
-                        Get AI Suggestions
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-800">AI Suggestions</h3>
-                  
-                  <ScrollArea className="h-96">
-                    {suggestions && suggestions.length > 0 ? (
-                      <div className="space-y-3">
-                        {suggestions.map((suggestion, index) => (
-                          <Card key={suggestion.id} className="border-l-4 border-warm-orange">
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between mb-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {suggestion.type}
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  {suggestion.confidence}% confidence
-                                </Badge>
+                        {isProcessing && (
+                          <div className="flex justify-start">
+                            <div className="bg-muted rounded-lg p-3">
+                              <div className="flex items-center gap-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                                <span className="text-sm">AI is thinking...</span>
                               </div>
-                              <p className="text-slate-700 text-sm">
-                                {suggestion.suggestion}
-                              </p>
-                              <div className="mt-3 flex space-x-2">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  className="text-energetic-green border-energetic-green hover:bg-energetic-green hover:text-white"
-                                >
-                                  <CheckCircle size={14} className="mr-1" />
-                                  Accept
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => toast({ title: "Feature coming soon!" })}
-                                >
-                                  <Copy size={14} className="mr-1" />
-                                  Copy
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-slate-500">
-                        <Lightbulb className="mx-auto mb-2" size={32} />
-                        <p>AI suggestions will appear here</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </ScrollArea>
-                </div>
-              </div>
-            </TabsContent>
+                </CardContent>
+              </Card>
 
-            {/* Analyze Match Tab */}
-            <TabsContent value="analyze" className="mt-6">
-              <Card className="border-l-4 border-vibrant-blue">
-                <CardContent className="p-6">
-                  <div className="text-center py-8">
-                    <Target className="mx-auto mb-4 text-vibrant-blue" size={48} />
-                    <h3 className="text-xl font-semibold text-slate-800 mb-2">Grant Match Analysis</h3>
-                    <p className="text-slate-600 mb-4">
-                      Analyze how well your organization aligns with grant opportunities
-                    </p>
-                    <Button 
-                      onClick={() => toast({ title: "Analysis feature coming soon!" })}
-                      className="bg-vibrant-blue hover:bg-deep-blue text-white"
-                    >
-                      <TrendingUp className="mr-2" size={16} />
-                      Start Analysis
-                    </Button>
+              <form onSubmit={handleSubmit} className="space-y-2">
+                <Textarea
+                  value={userQuery}
+                  onChange={(e) => setUserQuery(e.target.value)}
+                  placeholder="Ask your AI assistant anything about grants, funding, or application requirements..."
+                  className="min-h-[100px]"
+                  disabled={isProcessing}
+                />
+                <div className="flex justify-between items-center">
+                  <Button type="submit" disabled={isProcessing || !userQuery.trim()}>
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Message
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setConversation([])}
+                    disabled={conversation.length === 0}
+                  >
+                    Clear Chat
+                  </Button>
+                </div>
+              </form>
+            </div>
+
+            {/* Example Queries */}
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5" />
+                    Example Queries
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {exampleQueries.map((query, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        className="w-full justify-start text-left h-auto p-3"
+                        onClick={() => setUserQuery(query)}
+                        disabled={isProcessing}
+                      >
+                        <span className="text-sm">{query}</span>
+                      </Button>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
 
-      {/* Quick Tips */}
-      <Card className="shadow-sm border-t-4 border-energetic-green">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-slate-800 flex items-center">
-            <Award className="mr-2" size={20} />
-            AI Writing Tips
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-vibrant-blue/10 rounded-full flex items-center justify-center">
-                <span className="text-vibrant-blue font-semibold text-sm">1</span>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-800">Be Specific</h4>
-                <p className="text-sm text-slate-600">Provide detailed project descriptions for better AI-generated narratives</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-energetic-green/10 rounded-full flex items-center justify-center">
-                <span className="text-energetic-green font-semibold text-sm">2</span>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-800">Review & Edit</h4>
-                <p className="text-sm text-slate-600">Always review AI suggestions and adapt them to your unique voice</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-warm-orange/10 rounded-full flex items-center justify-center">
-                <span className="text-warm-orange font-semibold text-sm">3</span>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-800">Iterate</h4>
-                <p className="text-sm text-slate-600">Use multiple AI suggestions to refine and improve your content</p>
-              </div>
+              {/* MCP Capabilities */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    MCP Capabilities
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Real-time Grants.gov data</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Database className="w-4 h-4 text-blue-500" />
+                      <span className="text-sm">Live document analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-purple-500" />
+                      <span className="text-sm">Current funding trends</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm">Application validation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Award className="w-4 h-4 text-red-500" />
+                      <span className="text-sm">Competitor analysis</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+
+        <TabsContent value="tools" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="w-5 h-5" />
+                  Grant Search
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Search real-time grant opportunities with advanced filters
+                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Live Grants.gov integration</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Advanced filtering options</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Real-time deadline tracking</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Document Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  AI-powered analysis of grant documents and requirements
+                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Requirement extraction</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Deadline identification</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Eligibility analysis</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Trend Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Current funding trends and policy updates
+                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Real-time policy updates</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Funding trend analysis</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Market intelligence</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Validation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Validate applications against current requirements
+                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Requirement compliance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Format validation</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Completeness check</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  Competitor Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Analyze recent successful applications
+                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Recent award data</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Success patterns</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Competitive insights</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Intelligence
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Strategic intelligence and recommendations
+                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Funder analysis</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Strategic positioning</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>Success optimization</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="data" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Grants</CardTitle>
+                <Search className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {realTimeData?.grants_found || "..."}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Current opportunities
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Upcoming Deadlines</CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {realTimeData?.current_deadlines?.length || "..."}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This week
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Recent Awards</CardTitle>
+                <Award className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {realTimeData?.recent_awards?.length || "..."}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Last 30 days
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Trending Topics</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {realTimeData?.funding_trends?.length || "..."}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Current trends
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {realTimeData && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    Upcoming Deadlines
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {realTimeData.current_deadlines?.map((deadline, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                        <span className="text-sm">{deadline}</span>
+                        <Badge variant="secondary">Urgent</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="w-5 h-5" />
+                    Recent Awards
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {realTimeData.recent_awards?.map((award, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                        <div>
+                          <p className="font-medium text-sm">{award.organization}</p>
+                          <p className="text-xs text-muted-foreground">{award.project_type}</p>
+                        </div>
+                        <Badge variant="outline">{award.amount}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

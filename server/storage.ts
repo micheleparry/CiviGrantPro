@@ -161,8 +161,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteApplication(id: number): Promise<boolean> {
-    const result = await db.delete(applications).where(eq(applications.id, id));
-    return (result.rowCount || 0) > 0;
+    const result = await db.delete(applications).where(eq(applications.id, id)).returning();
+    return result.length > 0;
   }
 
   async getDocument(id: number): Promise<Document | undefined> {
@@ -185,8 +185,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteDocument(id: number): Promise<boolean> {
-    const result = await db.delete(documents).where(eq(documents.id, id));
-    return (result.rowCount || 0) > 0;
+    const result = await db.delete(documents).where(eq(documents.id, id)).returning();
+    return result.length > 0;
   }
 
   async getAiSuggestion(id: number): Promise<AiSuggestion | undefined> {
